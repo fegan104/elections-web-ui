@@ -17,6 +17,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import CircularProgress from '@mui/material/CircularProgress';
 
 const initialItems = ["SPD", "Z", "NSDAP", "DVU", "KPD", "DNVP"];
 
@@ -42,8 +43,15 @@ function SortableItem({ id }: { id: string }) {
   );
 }
 
+type Result<T> =
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'failure'; error: string };
+
+const Loading: Result<string> = { status: 'loading' }
+
 export default function Vote() {
-  const [electionId, setElectionId] = useState<string | null>(null);
+  const [electionId, setElectionId] = useState<Result<string>>(Loading);
   const [items, setItems] = useState<string[]>([]);
 
   const sensors = useSensors(
@@ -67,34 +75,46 @@ export default function Vote() {
   useEffect(() => {
     const parsedId = window.location.hash.slice(2);//remove leading "#/"
     if (parsedId.length > 1) {
-      setElectionId(parsedId);
+      setElectionId({ status: "success", data: parsedId });
+    } else {
+      setElectionId({ status: "failure", error: "Invalid electionid" });
     }
   }, []);
 
-  return (
-    <div className="grid items-center justify-items-center">
-      <main className="flex flex-col items-left">
+  if (electionId.status === 'failure') {
+    return (
+      <h3>Hmmn we can&apos;t find that election 🤔</h3>
+    )
+  } else if (electionId.status === 'loading') {
+    return (
+      <CircularProgress />
+    )
+  } else if (electionId.status === 'success') {
+    return (
+      <div className="grid items-center justify-items-center">
+        <main className="flex flex-col items-left">
 
-        <ul>
-          {initialItems.map((item, index) => (
-            <li onClick={() => setItems([...items, item])} key={index}>{item}</li>
-          ))}
-        </ul>
+          <ul>
+            {initialItems.map((item, index) => (
+              <li onClick={() => setItems([...items, item])} key={index}>{item}</li>
+            ))}
+          </ul>
 
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={items} strategy={verticalListSortingStrategy}>
-            <ul className="space-y-2 p-4 border rounded-lg">
-              {items.map((id) => (
-                <SortableItem key={id} id={id} />
-              ))}
-            </ul>
-          </SortableContext>
-        </DndContext>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={items} strategy={verticalListSortingStrategy}>
+              <ul className="space-y-2 p-4 border rounded-lg">
+                {items.map((id) => (
+                  <SortableItem key={id} id={id} />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
 
-        <button onClick={() => console.log("Voting! in " + electionId)}>
-          Cast Vote!
-        </button>
-      </main>
-    </div>
-  )
+          <button onClick={() => console.log("Voting! in " + electionId)}>
+            Cast Vote!
+          </button>
+        </main>
+      </div>
+    )
+  }
 }
