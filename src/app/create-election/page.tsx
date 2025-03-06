@@ -1,33 +1,42 @@
 "use client"
+import { createNewElection } from "@/data/electionsClient"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 export default function SignIn() {
   const [getCandidates, setCandidates] = useState<string[]>([])
   const [getAdmins, setAdmins] = useState<string[]>([])
   const [getElectionName, setElectionName] = useState<string>("")
-
+  const router = useRouter()
 
   return (
     <div className="grid items-center justify-items-center">
       <main className="flex flex-col items-left">
-        <input placeholder="Election Name" value={getElectionName} onChange={it => setElectionName(it.target.value)} />
 
-        <h6>Candidates</h6>
-        <NameList names={getCandidates} onChanged={setCandidates} />
-
-
-        <h6>Election Administrators</h6>
-        <NameList names={getAdmins} onChanged={setAdmins} />
-
-        <button onClick={() => console.log(
-          {
+        <form action={async () => {
+          const request = {
             name: getElectionName,
             candidates: getCandidates,
             administrators: getAdmins,
           }
-        )}>
-          Save
-        </button>
+          const response = await createNewElection(request)
+          if (response.ok) {
+            router.push("/view-elections")
+          }
+        }}>
+
+          <label htmlFor="election_name">Election name:</label>
+          <input type="text" name="election_name" value={getElectionName} onChange={it => setElectionName(it.target.value)} />
+
+          <h6>Candidates</h6>
+          <NameList names={getCandidates} onChanged={setCandidates} />
+
+
+          <h6>Election Administrators</h6>
+          <NameList names={getAdmins} onChanged={setAdmins} />
+
+          <button type="submit">Save</button>
+        </form>
       </main>
     </div>
   )

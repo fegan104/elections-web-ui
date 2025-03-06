@@ -18,10 +18,11 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from '@mui/material/CircularProgress';
+import { useHashRouteElectionId } from "./useHashRoute";
 
 const initialItems = ["SPD", "Z", "NSDAP", "DVU", "KPD", "DNVP"];
 
-function SortableItem({ id }: { id: string }) {
+function SortableItem({ id, onClick }: { id: string, onClick: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
   const style = {
@@ -32,26 +33,27 @@ function SortableItem({ id }: { id: string }) {
 
   return (
     <li
+      
+    >
+      <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
       className="p-2 bg-gray-200 rounded-lg cursor-grab"
-    >
-      {id}
+      >
+        {id}
+      </div>
+      
+      <div onClick={onClick}>
+        ❌
+      </div>
     </li>
   );
 }
 
-type Result<T> =
-  | { status: 'loading' }
-  | { status: 'success'; data: T }
-  | { status: 'failure'; error: string };
-
-const Loading: Result<string> = { status: 'loading' }
-
 export default function Vote() {
-  const [electionId, setElectionId] = useState<Result<string>>(Loading);
+  const { electionId, isLoading, failure } = useHashRouteElectionId()
   const [items, setItems] = useState<string[]>([]);
 
   const sensors = useSensors(
@@ -72,24 +74,20 @@ export default function Vote() {
     }
   };
 
-  useEffect(() => {
-    const parsedId = window.location.hash.slice(2);//remove leading "#/"
-    if (parsedId.length > 1) {
-      setElectionId({ status: "success", data: parsedId });
-    } else {
-      setElectionId({ status: "failure", error: "Invalid electionid" });
-    }
-  }, []);
+  const removeSelecteditem = (id: string) => {
+    console.log(items.filter((it) => it != id))
+    setItems(items.filter((it) => it != id))
+  }
 
-  if (electionId.status === 'failure') {
+
+  if (failure !== null) {
     return (
-      <h3>Hmmn we can&apos;t find that election 🤔</h3>
+      <div>
+        <h3>Hmmn we can&apos;t find that election 🤔</h3>
+        <h4>{failure.message}</h4>
+      </div>
     )
-  } else if (electionId.status === 'loading') {
-    return (
-      <CircularProgress />
-    )
-  } else if (electionId.status === 'success') {
+  } else if (electionId !== null) {
     return (
       <div className="grid items-center justify-items-center">
         <main className="flex flex-col items-left">
@@ -104,7 +102,7 @@ export default function Vote() {
             <SortableContext items={items} strategy={verticalListSortingStrategy}>
               <ul className="space-y-2 p-4 border rounded-lg">
                 {items.map((id) => (
-                  <SortableItem key={id} id={id} />
+                  <SortableItem key={id} id={id} onClick={() => removeSelecteditem(id)} />
                 ))}
               </ul>
             </SortableContext>
@@ -115,6 +113,10 @@ export default function Vote() {
           </button>
         </main>
       </div>
+    )
+  } else if (isLoading !== null) {
+    return (
+      <CircularProgress />
     )
   }
 }

@@ -1,31 +1,10 @@
-import { auth } from "@/data/firebaseClient"
+import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import useFirebaseUser from "./useFirebaseUser"
 import { useEffect, useState } from "react"
 const BASE_URL = "http://0.0.0.0:8080/"
 
-export async function fetchElections() {
-  console.log("Starting fetch elections")
-  await auth.authStateReady()
-  const idToken = await auth.currentUser?.getIdToken()
-
-  if (idToken === undefined) {
-    console.error("No idToken")
-    //return
-  }
-
-  const headers = {
-    Authorization: `Bearer ${idToken}`,
-  };
-
-  const requestOptions: RequestInit = { headers, cache: "no-cache" };
-
-  const response = await fetch(`${BASE_URL}elections`, requestOptions)
-
-  return await response?.json()
-}
-
-export function useGetCurrentUsersElections(): { data: Election | null; loading: boolean; error: string | null } {
-  const [data, setData] = useState<Election | null>(null);
+export function useGetCurrentUsersElections(): { data: Election[]; loading: boolean; error: string | null } {
+  const [data, setData] = useState<Election[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const user = useFirebaseUser()
@@ -48,9 +27,13 @@ export function useGetCurrentUsersElections(): { data: Election | null; loading:
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
+          } else if (response.status == 204) {
+            setData([]);
+          } else {
+            const jsonData = await response.json();
+            console.log(`Response: ${response.status} ${jsonData}`)
+            setData(jsonData);
           }
-          const jsonData: Election = await response.json();
-          setData(jsonData);
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -65,4 +48,44 @@ export function useGetCurrentUsersElections(): { data: Election | null; loading:
   }, [user]);
 
   return { data, loading, error };
+}
+
+interface CreateElectionRequest {
+  name: string
+  candidates: string[]
+  administrators: string[]
+}
+
+export async function createNewElection(request: CreateElectionRequest) {
+  await auth.authStateReady()
+  const idToken = await auth.currentUser?.getIdToken()
+  console.log(request)
+  const response = await fetch(`${BASE_URL}elections/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(request),
+  })
+
+  console.log(response)
+  return response
+}
+
+interface CreateUserRequest {
+  email: string,
+  password: string,
+}
+
+export async function createUser(request: CreateUserRequest) {
+  const credentials = await createUserWithEmailAndPassword(auth, request.email, request.password)
+  const idToken = await credentials.user.getIdToken()
+  return await fetch(`${BASE_URL}users/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+  })
 }

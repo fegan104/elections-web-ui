@@ -10,30 +10,35 @@ export default function SignIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentUser != null) {
-      router.push("/view-elections")
+      router.replace("/view-elections")
     }
   }, [currentUser, router])
 
-  const handleSignup = async () => {
+  const handleSignIn = async () => {
     try {
+      console.log("Attempting sign in");
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log("User signed up:", userCredential.user);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Unknown error");
+      }
     }
   };
 
   return (
     <div>
-      <h2>Sign Up</h2>
-      <form onSubmit={handleSignup}>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-        <button type="submit">Sign Up</button>
+      <h2>Enter you account details</h2>
+      <form action={handleSignIn}>
+        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
+        <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+        <button type="submit">Sign In</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
