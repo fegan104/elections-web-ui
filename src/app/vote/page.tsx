@@ -20,10 +20,8 @@ import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useGetElection } from "@/data/electionsClient";
 
-// const initialItems = ["SPD", "Z", "NSDAP", "DVU", "KPD", "DNVP"];
-
-function SortableItem({ id, onClick }: { id: string, onClick: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, onClick: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: candidate.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -40,7 +38,7 @@ function SortableItem({ id, onClick }: { id: string, onClick: () => void }) {
         {...listeners}
         className="p-2 bg-gray-200 rounded-lg cursor-grab"
       >
-        {id}
+        {candidate.name}
       </div>
 
       <div onClick={onClick}>
@@ -107,7 +105,7 @@ export default function Vote() {
             <SortableContext items={items} strategy={verticalListSortingStrategy}>
               <ul className="space-y-2 p-4 border rounded-lg">
                 {items.map(c => (
-                  <SortableItem key={c.id} id={c.id} onClick={() => removeSelecteditem(c.id)} />
+                  <SortableItem key={c.id} candidate={c} onClick={() => removeSelecteditem(c.id)} />
                 ))}
               </ul>
             </SortableContext>
