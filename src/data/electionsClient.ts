@@ -50,6 +50,53 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
   return { data, loading, error };
 }
 
+export function useGetElection(electionId: ElectionId | null): { election: Election | null; loading: boolean; error: string | null } {
+  const [election, setElection] = useState<Election | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const user = useFirebaseUser()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const idToken = await user?.getIdToken()
+
+        if (idToken === undefined) {
+          setError("No idToken");
+        } else if (electionId === null) {
+          setError("No electionId");
+        } else {
+          const headers = {
+            Authorization: `Bearer ${idToken}`,
+          };
+
+          const response = await fetch(`${BASE_URL}elections/${electionId}`, { headers })
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          } else {
+            const jsonData = await response.json();
+            console.log(`Response: ${response.status} ${JSON.stringify(jsonData)}`)
+            setElection(jsonData);
+          }
+        }
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err?.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [electionId, user]);
+
+  return { election, loading, error };
+}
+
 interface CreateElectionRequest {
   name: string
   candidates: string[]

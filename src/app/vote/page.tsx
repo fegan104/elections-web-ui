@@ -19,8 +19,9 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useHashRouteElectionId } from "./useHashRoute";
+import { useGetElection } from "@/data/electionsClient";
 
-const initialItems = ["SPD", "Z", "NSDAP", "DVU", "KPD", "DNVP"];
+// const initialItems = ["SPD", "Z", "NSDAP", "DVU", "KPD", "DNVP"];
 
 function SortableItem({ id, onClick }: { id: string, onClick: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -33,18 +34,18 @@ function SortableItem({ id, onClick }: { id: string, onClick: () => void }) {
 
   return (
     <li
-      
+
     >
       <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="p-2 bg-gray-200 rounded-lg cursor-grab"
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="p-2 bg-gray-200 rounded-lg cursor-grab"
       >
         {id}
       </div>
-      
+
       <div onClick={onClick}>
         ❌
       </div>
@@ -54,6 +55,7 @@ function SortableItem({ id, onClick }: { id: string, onClick: () => void }) {
 
 export default function Vote() {
   const { electionId, isLoading, failure } = useHashRouteElectionId()
+  const { election, loading, error } = useGetElection(electionId)
   const [items, setItems] = useState<string[]>([]);
 
   const sensors = useSensors(
@@ -87,14 +89,14 @@ export default function Vote() {
         <h4>{failure.message}</h4>
       </div>
     )
-  } else if (electionId !== null) {
+  } else if (electionId !== null && election !== null) {
     return (
       <div className="grid items-center justify-items-center">
         <main className="flex flex-col items-left">
 
           <ul>
-            {initialItems.map((item, index) => (
-              <li onClick={() => setItems([...items, item])} key={index}>{item}</li>
+            {[...election.candidates].map((item, index) => (
+              <li onClick={() => setItems([...items, item.name])} key={index}>{item.name}</li>
             ))}
           </ul>
 
