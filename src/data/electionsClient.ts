@@ -1,7 +1,8 @@
-import { useHashRouteElectionId } from "@/app/vote/useHashRoute";
+import { useSearchParams } from "next/navigation";
 import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import useFirebaseUser from "./useFirebaseUser"
 import { useEffect, useState } from "react"
+import { useQueryElectionId } from "@/app/vote/useHashRoute";
 const BASE_URL = "http://0.0.0.0:8080/"
 
 export function useGetCurrentUsersElections(): { data: Election[]; loading: boolean; error: string | null } {
@@ -52,7 +53,8 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
 }
 
 export function useGetElection(): { election: Election | null; loading: boolean; error: string | null } {
-  const { electionId, isLoading, failure } = useHashRouteElectionId()
+  // const { electionId, isLoading, failure } = useHashRouteElectionId()
+  const { electionId, isLoading, failure } = useQueryElectionId()
   const [election, setElection] = useState<Election | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +75,7 @@ export function useGetElection(): { election: Election | null; loading: boolean;
           const headers = {
             Authorization: `Bearer ${idToken}`,
           };
-
+          console.log(`Loading election id: ${electionId}`)
           const response = await fetch(`${BASE_URL}elections/${electionId}`, { headers })
 
           if (!response.ok) {
