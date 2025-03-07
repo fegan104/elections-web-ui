@@ -18,7 +18,6 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from '@mui/material/CircularProgress';
-import { useHashRouteElectionId } from "./useHashRoute";
 import { useGetElection } from "@/data/electionsClient";
 
 // const initialItems = ["SPD", "Z", "NSDAP", "DVU", "KPD", "DNVP"];
@@ -33,9 +32,7 @@ function SortableItem({ id, onClick }: { id: string, onClick: () => void }) {
   };
 
   return (
-    <li
-
-    >
+    <li>
       <div
         ref={setNodeRef}
         style={style}
@@ -54,9 +51,8 @@ function SortableItem({ id, onClick }: { id: string, onClick: () => void }) {
 }
 
 export default function Vote() {
-  const { electionId, isLoading, failure } = useHashRouteElectionId()
-  const { election, loading, error } = useGetElection(electionId)
-  const [items, setItems] = useState<string[]>([]);
+  const { election, loading, error } = useGetElection()
+  const [items, setItems] = useState<ElectionCandidate[]>([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -68,55 +64,62 @@ export default function Vote() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
+    const itemIds = items.map(it => it.id)
 
     if (active.id !== over?.id) {
-      const oldIndex = items.indexOf(active.id as string);
-      const newIndex = items.indexOf(over?.id as string);
+      const oldIndex = itemIds.indexOf(active.id as string);
+      const newIndex = itemIds.indexOf(over?.id as string);
       setItems(arrayMove(items, oldIndex, newIndex));
     }
   };
 
   const removeSelecteditem = (id: string) => {
-    console.log(items.filter((it) => it != id))
-    setItems(items.filter((it) => it != id))
+    console.log(items.filter((it) => it.id != id))
+    setItems(items.filter((it) => it.id != id))
   }
 
+  const onAddCandidateToRankingList = (item: ElectionCandidate) => {
+    if (items.some(c => c.id === item.id)) {
+      return
+    }
+    setItems([...items, item])
+  }
 
-  if (failure !== null) {
+  if (error !== null) {
     return (
       <div>
         <h3>Hmmn we can&apos;t find that election 🤔</h3>
-        <h4>{failure.message}</h4>
+        <h4>{error}</h4>
       </div>
     )
-  } else if (electionId !== null && election !== null) {
+  } else if (election !== null) {
     return (
       <div className="grid items-center justify-items-center">
         <main className="flex flex-col items-left">
 
           <ul>
-            {[...election.candidates].map((item, index) => (
-              <li onClick={() => setItems([...items, item.name])} key={index}>{item.name}</li>
+            {[...election.candidates].map(item => (
+              <li onClick={() => onAddCandidateToRankingList(item)} key={item.id}>{item.name}</li>
             ))}
           </ul>
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={items} strategy={verticalListSortingStrategy}>
               <ul className="space-y-2 p-4 border rounded-lg">
-                {items.map((id) => (
-                  <SortableItem key={id} id={id} onClick={() => removeSelecteditem(id)} />
+                {items.map(c => (
+                  <SortableItem key={c.id} id={c.id} onClick={() => removeSelecteditem(c.id)} />
                 ))}
               </ul>
             </SortableContext>
           </DndContext>
 
-          <button onClick={() => console.log("Voting! in " + electionId)}>
+          <button onClick={() => console.log("Voting! in " + election.id)}>
             Cast Vote!
           </button>
         </main>
       </div>
     )
-  } else if (isLoading !== null) {
+  } else if (loading !== null) {
     return (
       <CircularProgress />
     )

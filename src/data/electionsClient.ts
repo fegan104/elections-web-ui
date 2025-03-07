@@ -1,3 +1,4 @@
+import { useHashRouteElectionId } from "@/app/vote/useHashRoute";
 import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import useFirebaseUser from "./useFirebaseUser"
 import { useEffect, useState } from "react"
@@ -50,7 +51,8 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
   return { data, loading, error };
 }
 
-export function useGetElection(electionId: ElectionId | null): { election: Election | null; loading: boolean; error: string | null } {
+export function useGetElection(): { election: Election | null; loading: boolean; error: string | null } {
+  const { electionId, isLoading, failure } = useHashRouteElectionId()
   const [election, setElection] = useState<Election | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +67,7 @@ export function useGetElection(electionId: ElectionId | null): { election: Elect
 
         if (idToken === undefined) {
           setError("No idToken");
-        } else if (electionId === null) {
+        } else if (electionId === null || electionId === undefined) {
           setError("No electionId");
         } else {
           const headers = {
@@ -79,6 +81,7 @@ export function useGetElection(electionId: ElectionId | null): { election: Elect
           } else {
             const jsonData = await response.json();
             console.log(`Response: ${response.status} ${JSON.stringify(jsonData)}`)
+            setError(null)
             setElection(jsonData);
           }
         }
@@ -91,6 +94,7 @@ export function useGetElection(electionId: ElectionId | null): { election: Elect
       }
     };
 
+    console.log(`useGetElection ${electionId}`)
     fetchData();
   }, [electionId, user]);
 

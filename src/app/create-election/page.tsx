@@ -9,21 +9,23 @@ export default function SignIn() {
   const [getElectionName, setElectionName] = useState<string>("")
   const router = useRouter()
 
+  const submitForm = async () => {
+    const request = {
+      name: getElectionName,
+      candidates: getCandidates,
+      administrators: getAdmins,
+    }
+    const response = await createNewElection(request)
+    if (response.ok) {
+      router.replace("/view-elections")
+    }
+  }
+
   return (
     <div className="grid items-center justify-items-center">
       <main className="flex flex-col items-left">
 
-        <form action={async () => {
-          const request = {
-            name: getElectionName,
-            candidates: getCandidates,
-            administrators: getAdmins,
-          }
-          const response = await createNewElection(request)
-          if (response.ok) {
-            router.push("/view-elections")
-          }
-        }}>
+        <form action={submitForm}>
 
           <label htmlFor="election_name">Election name:</label>
           <input type="text" name="election_name" value={getElectionName} onChange={it => setElectionName(it.target.value)} />
@@ -69,7 +71,7 @@ const NameList: React.FC<{
         onChange={(e) => setName(e.target.value)}
         placeholder="Enter a new item"
       />
-      <button onClick={handleAddItem}>Add</button>
+      <button type="button" onClick={handleAddItem}>Add</button>
     </div>
   )
 }
