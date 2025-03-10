@@ -9,6 +9,7 @@ export default function Home() {
        <Link href="/sign-up">Sign Up</Link>
        <Link href="/sign-in">Sign In</Link>
        <Link href="/view-elections">View My Elections</Link>
+       <Link href="/view-results?electionId=94ee638d-1ece-4071-ad3c-710ac8641042">View My Results</Link>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
        

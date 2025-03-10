@@ -5,7 +5,6 @@ import { useState } from "react"
 
 export default function SignIn() {
   const [getCandidates, setCandidates] = useState<string[]>([])
-  const [getAdmins, setAdmins] = useState<string[]>([])
   const [getElectionName, setElectionName] = useState<string>("")
   const router = useRouter()
 
@@ -13,7 +12,6 @@ export default function SignIn() {
     const request = {
       name: getElectionName,
       candidates: getCandidates,
-      administrators: getAdmins,
     }
     const response = await createNewElection(request)
     if (response.ok) {
@@ -32,10 +30,6 @@ export default function SignIn() {
 
           <h6>Candidates</h6>
           <NameList names={getCandidates} onChanged={setCandidates} />
-
-
-          <h6>Election Administrators</h6>
-          <NameList names={getAdmins} onChanged={setAdmins} />
 
           <button type="submit">Save</button>
         </form>

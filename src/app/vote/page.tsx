@@ -18,7 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from '@mui/material/CircularProgress';
-import { useGetElection } from "@/data/electionsClient";
+import { sendVote, useGetElection } from "@/data/electionsClient";
 
 function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, onClick: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: candidate.id });
@@ -31,7 +31,7 @@ function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, on
 
   return (
     <li>
-      <div
+      <span
         ref={setNodeRef}
         style={style}
         {...attributes}
@@ -39,11 +39,11 @@ function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, on
         className="p-2 bg-gray-200 rounded-lg cursor-grab"
       >
         {candidate.name}
-      </div>
+      </span>
 
-      <div onClick={onClick}>
+      <span onClick={onClick}>
         ❌
-      </div>
+      </span>
     </li>
   );
 }
@@ -51,6 +51,7 @@ function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, on
 export default function Vote() {
   const { election, loading, error } = useGetElection()
   const [items, setItems] = useState<ElectionCandidate[]>([]);
+  const [submissionState, setSubmissionState] = useState<boolean | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -83,7 +84,22 @@ export default function Vote() {
     setItems([...items, item])
   }
 
-  if (error !== null) {
+  const castVote = async () => {
+    const electionId = election?.id
+    if (electionId === undefined) {
+        return
+    }
+    const response = await sendVote(electionId, items)
+    setSubmissionState(response.ok)
+  }
+
+  if (submissionState === true) {
+    return (
+      <div>
+        <h3>Your ballot was submitted successfully ✅</h3>
+      </div>
+    )
+  } else if (error !== null) {
     return (
       <div>
         <h3>Hmmn we can&apos;t find that election 🤔</h3>
@@ -95,11 +111,17 @@ export default function Vote() {
       <div className="grid items-center justify-items-center">
         <main className="flex flex-col items-left">
 
+          {
+            (submissionState === false) ? ( <h3>There was a problem submitting youre ballot. Try again.</h3>) : <></>
+          }
+
           <ul>
             {[...election.candidates].map(item => (
               <li onClick={() => onAddCandidateToRankingList(item)} key={item.id}>{item.name}</li>
             ))}
           </ul>
+
+          {(loading === true) ? <CircularProgress /> : <></>}
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={items} strategy={verticalListSortingStrategy}>
@@ -111,15 +133,11 @@ export default function Vote() {
             </SortableContext>
           </DndContext>
 
-          <button onClick={() => console.log("Voting! in " + election.id)}>
+          <button onClick={castVote}>
             Cast Vote!
           </button>
         </main>
       </div>
-    )
-  } else if (loading !== null) {
-    return (
-      <CircularProgress />
     )
   }
 }

@@ -15,3 +15,14 @@ interface ElectionCandidate {
   electionId: ElectionId;
   name: string;
 }
+
+interface ElectionUser {
+  id: UserId;
+  name: string;
+}
+
+interface ElectionWinnersResponse {
+  election: Election
+  voters: ElectionUser[],
+  winners: ElectionCandidate[] | null
+}

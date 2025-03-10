@@ -1,9 +1,100 @@
 import { useSearchParams } from "next/navigation";
 import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import useFirebaseUser from "./useFirebaseUser"
-import { useEffect, useState } from "react"
-import { useQueryElectionId } from "@/app/vote/useHashRoute";
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
+
 const BASE_URL = "http://0.0.0.0:8080/"
+
+///////TYPES
+
+interface RouteElectionIdState {
+  electionId: ElectionId | null,
+  isLoading: boolean,
+  failure: Error | null
+}
+
+interface CreateUserRequest {
+  email: string,
+  password: string,
+}
+
+interface CreateElectionRequest {
+  name: string
+  candidates: string[]
+}
+
+/////FUNCTIONS
+
+export async function createNewElection(request: CreateElectionRequest) {
+  await auth.authStateReady()
+  const idToken = await auth.currentUser?.getIdToken()
+  console.log(request)
+  const response = await fetch(`${BASE_URL}elections/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(request),
+  })
+
+  console.log(response)
+  return response
+}
+
+export async function createUser(request: CreateUserRequest) {
+  const credentials = await createUserWithEmailAndPassword(auth, request.email, request.password)
+  const idToken = await credentials.user.getIdToken()
+  return await fetch(`${BASE_URL}users/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+  })
+}
+
+export async function sendVote(electionId: ElectionId, rankings: ElectionCandidate[]) {
+  await auth.authStateReady()
+  const idToken = await auth.currentUser?.getIdToken()
+  const request = rankings.map((candidate, index) => {
+    return {
+      candidateId: candidate.id,
+      rank: (index + 1)
+    }
+  })
+  return await fetch(`${BASE_URL}elections/vote?electionId=${electionId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(request)
+  })
+}
+
+//////HOOKS
+
+export function useQueryElectionId(): RouteElectionIdState {
+  const queryParams = useSearchParams()
+  const [state, setState] = useState<RouteElectionIdState>({
+    electionId: null,
+    isLoading: true,
+    failure: null,
+  })
+
+  useEffect(() => {
+    const parsedId = queryParams.get("electionId")
+    if (parsedId !== undefined && parsedId != null && parsedId.length > 1) {
+      setState({ electionId: parsedId, isLoading: false, failure: null });
+    } else {
+      setState({ electionId: null, isLoading: false, failure: Error(`Invalid electionid: ${parsedId}`) });
+    }
+  }, [queryParams]);
+
+  return state
+}
+
 
 export function useGetCurrentUsersElections(): { data: Election[]; loading: boolean; error: string | null } {
   const [data, setData] = useState<Election[]>([]);
@@ -53,8 +144,7 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
 }
 
 export function useGetElection(): { election: Election | null; loading: boolean; error: string | null } {
-  // const { electionId, isLoading, failure } = useHashRouteElectionId()
-  const { electionId, isLoading, failure } = useQueryElectionId()
+  const { electionId } = useQueryElectionId()
   const [election, setElection] = useState<Election | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +159,7 @@ export function useGetElection(): { election: Election | null; loading: boolean;
 
         if (idToken === undefined) {
           setError("No idToken");
-        } else if (electionId === null || electionId === undefined) {
+        } else if (electionId === null) {
           setError("No electionId");
         } else {
           const headers = {
@@ -89,7 +179,7 @@ export function useGetElection(): { election: Election | null; loading: boolean;
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
-          setError(err?.message);
+          setError(err.message);
         }
       } finally {
         setLoading(false);
@@ -103,42 +193,71 @@ export function useGetElection(): { election: Election | null; loading: boolean;
   return { election, loading, error };
 }
 
-interface CreateElectionRequest {
-  name: string
-  candidates: string[]
-  administrators: string[]
+export function useGetElectionWinners(): {
+  response: ElectionWinnersResponse | null;
+  setResponse: Dispatch<SetStateAction<ElectionWinnersResponse | null>>;
+  loading: boolean;
+  error: string | null;
+} {
+  const { electionId } = useQueryElectionId()
+  const [response, setResponse] = useState<ElectionWinnersResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (electionId === null) {
+          setError("No electionId");
+        } else {
+          console.log(`Loading election id: ${electionId}`)
+          const response = await fetch(`${BASE_URL}elections/results?electionId=${electionId}&numWinners=1`)
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          } else {
+            const jsonData = await response.json();
+            console.log(`Response: ${response.status} ${JSON.stringify(jsonData)}`)
+            setError(null)
+            setResponse(jsonData);
+          }
+        }
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    console.log(`useGetElection ${electionId}`)
+    fetchData();
+  }, [electionId]);
+
+  return { response, setResponse, loading, error };
 }
 
-export async function createNewElection(request: CreateElectionRequest) {
+
+export async function closeElection(electionId: ElectionId, numWinners: number): Promise<ElectionWinnersResponse | Error> {
   await auth.authStateReady()
   const idToken = await auth.currentUser?.getIdToken()
-  console.log(request)
-  const response = await fetch(`${BASE_URL}elections/create`, {
+  const response = await fetch(`${BASE_URL}elections/close?electionId=${electionId}&numWinners=${numWinners}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${idToken}`,
     },
-    body: JSON.stringify(request),
   })
 
   console.log(response)
-  return response
-}
 
-interface CreateUserRequest {
-  email: string,
-  password: string,
-}
+  if (!response.ok) {
+    return Error(`Http error code=${response.status}`)
+  }
 
-export async function createUser(request: CreateUserRequest) {
-  const credentials = await createUserWithEmailAndPassword(auth, request.email, request.password)
-  const idToken = await credentials.user.getIdToken()
-  return await fetch(`${BASE_URL}users/create`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${idToken}`,
-    },
-  })
+  const winners = await response.json()
+  return winners
 }
