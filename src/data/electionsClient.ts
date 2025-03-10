@@ -195,7 +195,7 @@ export function useGetElection(): { election: Election | null; loading: boolean;
 
 export function useGetElectionWinners(): {
   response: ElectionWinnersResponse | null;
-  setResponse: Dispatch<SetStateAction<ElectionWinnersResponse | null>>;
+  closeElection: (numWinners: number) => void;
   loading: boolean;
   error: string | null;
 } {
@@ -203,6 +203,21 @@ export function useGetElectionWinners(): {
   const [response, setResponse] = useState<ElectionWinnersResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const closeElection = async (numWinners: number) => {
+      try {
+        const electionId = response?.election?.id
+        if (electionId == undefined) return
+        setLoading(true)
+        const closedResponse = await sendCloseElection(electionId, numWinners)
+        if (closedResponse instanceof Error) {
+          return
+        }
+        setResponse(closedResponse)
+      } finally {
+        setLoading(false)
+      }
+    }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -237,11 +252,11 @@ export function useGetElectionWinners(): {
     fetchData();
   }, [electionId]);
 
-  return { response, setResponse, loading, error };
+  return { response, closeElection, loading, error };
 }
 
 
-export async function closeElection(electionId: ElectionId, numWinners: number): Promise<ElectionWinnersResponse | Error> {
+async function sendCloseElection(electionId: ElectionId, numWinners: number): Promise<ElectionWinnersResponse | Error> {
   await auth.authStateReady()
   const idToken = await auth.currentUser?.getIdToken()
   const response = await fetch(`${BASE_URL}elections/close?electionId=${electionId}&numWinners=${numWinners}`, {

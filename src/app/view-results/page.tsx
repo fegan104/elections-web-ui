@@ -1,18 +1,12 @@
 "use client"
-import { closeElection, useGetElectionWinners } from "@/data/electionsClient";
+import { useGetElectionWinners } from "@/data/electionsClient";
 import { CircularProgress } from "@mui/material";
 
 export default function ViewResults() {
-  const { response, setResponse, loading, error } = useGetElectionWinners()
+  const { response, closeElection, loading, error } = useGetElectionWinners()
 
   const handleCloseElection = async () => {
-    const electionId = response?.election?.id
-    if (electionId == undefined) return
-    const closedResponse = await closeElection(electionId, 1)
-    if (closedResponse instanceof Error) {
-      return
-    }
-    setResponse(closedResponse)
+    closeElection(1)
   }
 
   return (
