@@ -1,5 +1,5 @@
-"use client"; // Ensures this runs only on the client side
-import { useEffect, useState } from "react";
+"use client";
+import { Suspense, useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from '@mui/material/CircularProgress';
+import { ElectionCandidate } from "@/data/model/models";
 import { sendVote, useGetElection } from "@/data/electionsClient";
 
 function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, onClick: () => void }) {
@@ -48,7 +49,7 @@ function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, on
   );
 }
 
-export default function Vote() {
+function VoteScreen() {
   const { election, loading, error } = useGetElection()
   const [items, setItems] = useState<ElectionCandidate[]>([]);
   const [submissionState, setSubmissionState] = useState<boolean | null>(null)
@@ -87,7 +88,7 @@ export default function Vote() {
   const castVote = async () => {
     const electionId = election?.id
     if (electionId === undefined) {
-        return
+      return
     }
     const response = await sendVote(electionId, items)
     setSubmissionState(response.ok)
@@ -112,7 +113,7 @@ export default function Vote() {
         <main className="flex flex-col items-left">
 
           {
-            (submissionState === false) ? ( <h3>There was a problem submitting youre ballot. Try again.</h3>) : <></>
+            (submissionState === false) ? (<h3>There was a problem submitting youre ballot. Try again.</h3>) : <></>
           }
 
           <ul>
@@ -140,4 +141,12 @@ export default function Vote() {
       </div>
     )
   }
+}
+
+export default function Vote() {
+  return (
+    <Suspense>
+      <VoteScreen />
+    </Suspense>
+  )
 }

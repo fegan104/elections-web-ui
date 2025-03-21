@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { auth, signInWithEmailAndPassword } from "../../data/firebaseClient";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { useRouter } from "next/navigation";
+import { TextField } from "@mui/material";
 
 export default function SignIn() {
   const currentUser = useFirebaseUser()
@@ -36,8 +37,8 @@ export default function SignIn() {
     <div>
       <h2>Enter you account details</h2>
       <form action={handleSignIn}>
-        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-        <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+        <TextField variant="outlined" id="email"value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required/>
+        <TextField variant="outlined" id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required/>
         <button type="submit">Sign In</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}

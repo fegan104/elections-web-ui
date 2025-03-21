@@ -1,28 +1,36 @@
-type ElectionId = string
-type UserId = string
-type CandidateId = string
+export type ElectionId = string
+export type UserId = string
+export type CandidateId = string
 
-interface Election {
+export interface Election {
   id: ElectionId;
   name: string;
-  administrators: Set<UserId>;
-  candidates: Set<ElectionCandidate>;
-  voters: Set<UserId>;
+  isOpen: boolean;
+  candidates: ElectionCandidate[];
+  voters: UserId[];
 }
 
-interface ElectionCandidate {
+export interface ElectionCandidate {
   id: CandidateId;
   electionId: ElectionId;
   name: string;
 }
 
-interface ElectionUser {
+export interface ElectionUser {
   id: UserId;
   name: string;
 }
 
-interface ElectionWinnersResponse {
+export interface Winner {
+  candidate: ElectionCandidate;
+  votes: number;
+}
+
+export interface ElectionWinnersResponse {
   election: Election
   voters: ElectionUser[],
-  winners: ElectionCandidate[] | null
+  winners: {
+    winners: Winner[];
+    exhausted: number;
+  }| null
 }

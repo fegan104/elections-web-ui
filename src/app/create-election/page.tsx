@@ -1,5 +1,6 @@
 "use client"
 import { createNewElection } from "@/data/electionsClient"
+import { Button, List, ListItem, TextField, Typography } from "@mui/material"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -25,13 +26,19 @@ export default function SignIn() {
 
         <form action={submitForm}>
 
-          <label htmlFor="election_name">Election name:</label>
-          <input type="text" name="election_name" value={getElectionName} onChange={it => setElectionName(it.target.value)} />
+          <TextField
+            variant="outlined"
+            type="text"
+            name="election_name"
+            value={getElectionName}
+            onChange={it => setElectionName(it.target.value)}
+            label="Election name"
+          />
 
-          <h6>Candidates</h6>
+          <Typography variant="h6">Candidates</Typography>
           <NameList names={getCandidates} onChanged={setCandidates} />
 
-          <button type="submit">Save</button>
+          <Button variant="contained" type="submit" style={{margin: "16px"}}>Save</Button>
         </form>
       </main>
     </div>
@@ -53,19 +60,19 @@ const NameList: React.FC<{
 
   return (
     <div>
-      <ul>
+      <List>
         {names.map((item, index) => (
-          <li key={index}>-{item}</li>
+          <ListItem key={index}>-{item}</ListItem>
         ))}
-      </ul>
+      </List>
 
-      <input
+      <TextField
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Enter a new item"
+        label="Candidate name"
       />
-      <button type="button" onClick={handleAddItem}>Add</button>
+      <Button variant="text" type="button" onClick={handleAddItem}>Add</Button>
     </div>
   )
 }

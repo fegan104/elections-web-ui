@@ -1,9 +1,10 @@
 import { useSearchParams } from "next/navigation";
+import { ElectionWinnersResponse, ElectionId, ElectionCandidate, Election } from "@/data/model/models";
 import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import useFirebaseUser from "./useFirebaseUser"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
-const BASE_URL = "http://0.0.0.0:8080/"
+const BASE_URL = "https://scottish-stv-api-747477139031.us-central1.run.app/"//"http://0.0.0.0:8080/"
 
 ///////TYPES
 
@@ -186,7 +187,6 @@ export function useGetElection(): { election: Election | null; loading: boolean;
       }
     };
 
-    console.log(`useGetElection ${electionId}`)
     fetchData();
   }, [electionId, user]);
 
@@ -205,19 +205,19 @@ export function useGetElectionWinners(): {
   const [error, setError] = useState<string | null>(null);
 
   const closeElection = async (numWinners: number) => {
-      try {
-        const electionId = response?.election?.id
-        if (electionId == undefined) return
-        setLoading(true)
-        const closedResponse = await sendCloseElection(electionId, numWinners)
-        if (closedResponse instanceof Error) {
-          return
-        }
-        setResponse(closedResponse)
-      } finally {
-        setLoading(false)
+    try {
+      const electionId = response?.election?.id
+      if (electionId == undefined) return
+      setLoading(true)
+      const closedResponse = await sendCloseElection(electionId, numWinners)
+      if (closedResponse instanceof Error) {
+        return
       }
+      setResponse(closedResponse)
+    } finally {
+      setLoading(false)
     }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -248,7 +248,6 @@ export function useGetElectionWinners(): {
       }
     };
 
-    console.log(`useGetElection ${electionId}`)
     fetchData();
   }, [electionId]);
 
