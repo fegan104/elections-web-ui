@@ -6,9 +6,11 @@ import { Election } from "@/data/model/models"
 import { Suspense } from 'react'
 
 export default function ViewElections() {
-  <Suspense>
-    <ViewElectionsContent />
-  </Suspense>
+  return (
+    <Suspense>
+      <ViewElectionsContent />
+    </Suspense>
+  )
 }
 
 const ViewElectionsContent = () => {
