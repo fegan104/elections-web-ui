@@ -42,7 +42,7 @@ const TopAppBar = () => {
   }
 
   return (
-    <div className="sticky w-full flex flex-row flex-shrink-0 align-middle justify-end px-4 py-2 items-center space-x-2">
+    <div className="sticky w-full flex flex-row flex-shrink-0 align-middle justify-end px-4 py-2 mt-2 items-center space-x-2">
         {user ? (
           <>
             <TonalButton onClick={handleSignOut}>
