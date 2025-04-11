@@ -2,9 +2,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import useFirebaseUser from "@/data/useFirebaseUser";
-import { AppBar, Avatar, Button, IconButton, Toolbar } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import { auth, signOut } from "@/data/firebaseClient"
-import Link from "next/link";
+import { TonalButton } from "@/components/Buttons";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,10 +23,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background font-mono h-screen flex flex-col`}>
         <TopAppBar />
 
-        {children}
+        <div className="ring-foreground ring-1 rounded-2xl m-4 flex-grow p-2 bg-neutral-100 overflow-scroll">
+          {children}
+        </div>
       </body>
     </html>
   );
@@ -40,26 +42,24 @@ const TopAppBar = () => {
   }
 
   return (
-    <AppBar position="sticky">
-      <Toolbar>
+    <div className="sticky w-full flex flex-row flex-shrink-0 align-middle justify-end px-4 py-2 items-center space-x-2">
         {user ? (
           <>
-            <IconButton color="inherit" onClick={handleSignOut}>
+            <TonalButton onClick={handleSignOut}>
               Sign Out
-            </IconButton>
+            </TonalButton>
             <Avatar alt={user.displayName ?? undefined} src={user.photoURL ?? undefined} />
           </>
         ) : (
           <>
-            <Link href="/sign-in" passHref>
+            <a href="/sign-in">
               <Button color="inherit">Sign In</Button>
-            </Link>
-            <Link href="/sign-up" passHref>
+            </a>
+            <a href="/sign-up">
               <Button color="inherit">Sign Up</Button>
-            </Link>
+            </a>
           </>
         )}
-      </Toolbar>
-    </AppBar>
+      </div>
   );
 };

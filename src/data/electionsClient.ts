@@ -4,7 +4,8 @@ import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import useFirebaseUser from "./useFirebaseUser"
 import { useEffect, useState } from "react"
 
-const BASE_URL = "https://scottish-stv-api-747477139031.us-central1.run.app/"//"http://0.0.0.0:8080/"
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL
+console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
 
 ///////TYPES
 

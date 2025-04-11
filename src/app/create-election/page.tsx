@@ -1,6 +1,5 @@
 "use client"
 import { createNewElection } from "@/data/electionsClient"
-import { Button, List, ListItem, TextField, Typography } from "@mui/material"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -21,24 +20,23 @@ export default function SignIn() {
   }
 
   return (
-    <div className="grid items-center justify-items-center">
-      <main className="flex flex-col items-left">
+    <div className="items-center justify-items-center">
+      <main className="flex flex-col bg-white rounded-md p-2 ">
 
         <form action={submitForm}>
 
-          <TextField
-            variant="outlined"
+          <TextInput
+            className=""
             type="text"
-            name="election_name"
             value={getElectionName}
-            onChange={it => setElectionName(it.target.value)}
+            onChange={it => setElectionName(it)}
             label="Election name"
           />
 
-          <Typography variant="h6">Candidates</Typography>
+          <h6>Candidates</h6>
           <NameList names={getCandidates} onChanged={setCandidates} />
 
-          <Button variant="contained" type="submit" style={{margin: "16px"}}>Save</Button>
+          <button type="submit" style={{margin: "16px"}}>Save</button>
         </form>
       </main>
     </div>
@@ -59,20 +57,56 @@ const NameList: React.FC<{
   };
 
   return (
-    <div>
-      <List>
+    <div className="flex flex-col">
+      <ul>
         {names.map((item, index) => (
-          <ListItem key={index}>-{item}</ListItem>
+          <li key={index}>-{item}</li>
         ))}
-      </List>
+      </ul>
 
-      <TextField
+      <TextInput
+        className="my-2"
         type="text"
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => setName(e)}
         label="Candidate name"
       />
-      <Button variant="text" type="button" onClick={handleAddItem}>Add</Button>
+      <button className="px-3 py-1 bg-blue-500 rounded-md place-self-end" type="button" onClick={handleAddItem}>Add</button>
     </div>
   )
 }
+
+type TextInputProps = {
+  label?: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: React.HTMLInputTypeAttribute;
+  className?: string;
+};
+
+const TextInput: React.FC<TextInputProps> = ({
+  label,
+  value,
+  onChange,
+  placeholder = "",
+  type = "text",
+  className = "",
+}) => {
+  return (
+    <div className="flex flex-col gap-1 w-full">
+      {label && (
+        <label className="text-sm font-medium text-gray-700">
+          {label}
+        </label>
+      )}
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-sm ${className}`}
+      />
+    </div>
+  );
+};

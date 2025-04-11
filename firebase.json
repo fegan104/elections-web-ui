@@ -5,6 +5,39 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/create-election",
+        "destination": "/create-election.html"
+      },
+      {
+        "source": "/sign-in",
+        "destination": "/sign-in.html"
+      },
+      {
+        "source": "/sign-up",
+        "destination": "/sign-up.html"
+      },
+      {
+        "source": "/view-elections",
+        "destination": "/view-elections.html"
+      },
+      {
+        "source": "/view-results",
+        "destination": "/view-results.html"
+      },
+      {
+        "source": "/vote",
+        "destination": "/vote.html"
+      },
+      {
+        "source": "/api/v1/**",
+        "run": {
+          "serviceId": "scottish-stv-api",
+          "region": "us-central1"
+        }
+      }
     ]
   }
 }

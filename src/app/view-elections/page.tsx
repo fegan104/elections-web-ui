@@ -1,9 +1,9 @@
 'use client'
 import { useGetCurrentUsersElections } from "@/data/electionsClient"
-import { Card, CardContent, CircularProgress, List, ListItem, ListItemText, Typography } from "@mui/material";
-import Link from "next/link";
+import { CircularProgress } from "@mui/material";
 import { Election } from "@/data/model/models"
 import { Suspense } from 'react'
+import { TextButton } from "@/components/Buttons";
 
 export default function ViewElections() {
   return (
@@ -23,7 +23,7 @@ const ViewElectionsContent = () => {
   } else if (data) {
     return (
       <main>
-        <Typography variant="h4">View Elections</Typography>
+        <h4>View Elections</h4>
 
         <ElectionList elections={data} />
       </main>
@@ -35,31 +35,39 @@ const ElectionList: React.FC<{ elections: Election[] }> = ({ elections }) => {
   return (
     <div>
       {elections.map((election) => (
-        <Card key={election.id} style={{ margin: "20px", padding: "10px" }}>
-          <CardContent>
-            <Typography variant="h5">{election.name}</Typography>
-            <Typography variant="subtitle1">Status: {election.isOpen ? "Open" : "Closed"}</Typography>
-            <Typography variant="subtitle2">Candidates</Typography>
-            <List>
+        <div className="border-black p-2" key={election.id}>
+          <h5>{election.name}</h5>
+            <div className="text-base">Status: {election.isOpen ? "Open" : "Closed"}</div>
+            <div className="text-sm font-medium">Candidates</div>
+            <ul>
               {election.candidates.map((candidate) => (
-                <ListItem key={candidate.id}>
-                  <ListItemText primary={"-" + candidate.name} />
-                </ListItem>
+                <li key={candidate.id}>
+                  {"-" + candidate.name}
+                </li>
               ))}
-            </List>
-            <Typography variant="subtitle2">Voters: {election.voters.length} total vote(s)</Typography>
-            <List>
+            </ul>
+            <div className="text-sm font-medium">Voters: {election.voters.length} total vote(s)</div>
+            <ul>
               {election.voters.map((voter) => (
-                <ListItem key={voter}>
-                  <ListItemText primary={voter} />
-                </ListItem>
+                <li key={voter}>
+                  {voter}
+                </li>
               ))}
-            </List>
-            <Link href={`/view-results?electionId=${election.id}`} passHref>
-              <Typography variant="body1" color="primary" style={{ cursor: "pointer" }}>View Results</Typography>
-            </Link>
-          </CardContent>
-        </Card>
+            </ul>
+            <div className="flex space-x-4">
+
+              <a href={`/view-results?electionId=${election.id}`}>
+                <TextButton > {"View Results"} </TextButton>
+              </a>
+              {
+                election.isOpen ?
+                  (<a href={`/vote?electionId=${election.id}`}>
+                    <TextButton > {"Vote"} </TextButton>
+                  </a>) : <></>
+              }
+
+            </div>
+        </div>
       ))}
     </div>
   );
