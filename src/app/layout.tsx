@@ -4,7 +4,7 @@ import "./globals.css";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { Avatar, Button } from "@mui/material";
 import { auth, signOut } from "@/data/firebaseClient"
-import { TonalButton } from "@/components/Buttons";
+import { TextButton, TonalButton } from "@/components/Buttons";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,14 +23,52 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background font-mono h-screen flex flex-col`}>
-        <TopAppBar />
+      <head>
+        <title>cascade-elections</title>
+        <meta name="description" content="A single tranferable vote elections web app." />
+        <meta name="author" content="Frank Egan" />
+        <meta name="theme-color" content="#3b82f6" />
 
-        <div className="ring-foreground ring-1 rounded-2xl m-4 flex-grow p-2 bg-neutral-100 overflow-scroll">
+      </head>
+      <body className={`
+          ${geistSans.variable} ${geistMono.variable} 
+          antialiased bg-background font-mono 
+          h-screen overflow-hidden flex flex-col`}>
+
+        <Scaffold>
           {children}
-        </div>
+        </Scaffold>
+
       </body>
     </html>
+  );
+}
+
+function Scaffold({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <div className="h-screen overflow-hidden flex flex-col">
+      <TopAppBar />
+
+      <div className="flex flex-1 overflow-hidden">
+        <div className="hidden md:flex flex-col sm:hidden">
+          <SideBar />
+        </div>
+
+        <div className="flex flex-1 flex-col">
+          <div className="flex-1 overflow-y-auto p-4 ring-foreground ring-1 rounded-2xl m-4">
+            {children}
+          </div>
+
+          <div className="flex md:hidden w-full h-16">
+            <BottomAppBar />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -43,23 +81,50 @@ const TopAppBar = () => {
 
   return (
     <div className="sticky w-full flex flex-row flex-shrink-0 align-middle justify-end px-4 py-2 mt-2 items-center space-x-2">
-        {user ? (
-          <>
-            <TonalButton onClick={handleSignOut}>
-              Sign Out
-            </TonalButton>
-            <Avatar alt={user.displayName ?? undefined} src={user.photoURL ?? undefined} />
-          </>
-        ) : (
-          <>
-            <a href="/sign-in">
-              <Button color="inherit">Sign In</Button>
-            </a>
-            <a href="/sign-up">
-              <Button color="inherit">Sign Up</Button>
-            </a>
-          </>
-        )}
-      </div>
+      {user ? (
+        <>
+          <h4 className="flex-1 justify-start">cascade-elections</h4>
+          <TonalButton onClick={handleSignOut}>
+            Sign Out
+          </TonalButton>
+          <Avatar alt={user.displayName ?? undefined} src={user.photoURL ?? undefined} />
+        </>
+      ) : (
+        <>
+          <a href="/sign-in">
+            <Button color="inherit">Sign In</Button>
+          </a>
+          <a href="/sign-up">
+            <Button color="inherit">Sign Up</Button>
+          </a>
+        </>
+      )}
+    </div>
   );
+};
+
+const SideBar = () => {
+
+  return (
+    <div className="p-4 justify-items-center">
+      <a href="/create-election">
+        <TonalButton>➕ Create an Election</TonalButton>
+      </a>
+
+      <div className="pt-4 justify-center">
+        <a href="/view-elections">
+          <TextButton className="text-on-surface">View My Elections</TextButton>
+        </a>
+      </div>
+    </div>
+  )
+};
+
+const BottomAppBar = () => {
+  return (
+    <div className=" bg-secondary-container rounded-t-md flex-1 px-4 flex items-center">
+      <a href="/view-elections"><TextButton className="text-on-surface">View My Elections</TextButton></a>
+      <a href="/create-election"><TextButton className="text-on-surface">Create an Election</TextButton></a>
+    </div>
+  )
 };

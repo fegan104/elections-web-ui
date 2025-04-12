@@ -1,7 +1,9 @@
 "use client"
+import { TextButton, TonalButton } from "@/components/Buttons"
+import { TextInput } from "@/components/TextInput"
 import { createNewElection } from "@/data/electionsClient"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { KeyboardEvent, useState } from "react"
 
 export default function SignIn() {
   const [getCandidates, setCandidates] = useState<string[]>([])
@@ -21,22 +23,21 @@ export default function SignIn() {
 
   return (
     <div className="items-center justify-items-center">
-      <main className="flex flex-col bg-white rounded-md p-2 ">
+      <main className="flex flex-col bg-white rounded-md p-4 max-w-1/4">
 
-        <form action={submitForm}>
+        <form action={submitForm} className="space-y-4">
 
           <TextInput
             className=""
             type="text"
+            placeholder="Election Name"
             value={getElectionName}
             onChange={it => setElectionName(it)}
-            label="Election name"
           />
 
-          <h6>Candidates</h6>
           <NameList names={getCandidates} onChanged={setCandidates} />
 
-          <button type="submit" style={{margin: "16px"}}>Save</button>
+          <TonalButton type="submit" className="w-full">Save</TonalButton>
         </form>
       </main>
     </div>
@@ -56,57 +57,33 @@ const NameList: React.FC<{
     }
   };
 
+  const handleEnterKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      handleAddItem()
+    }
+  };
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
+      <h6>Candidates</h6>
       <ul>
         {names.map((item, index) => (
           <li key={index}>-{item}</li>
         ))}
       </ul>
 
-      <TextInput
-        className="my-2"
-        type="text"
-        value={name}
-        onChange={(e) => setName(e)}
-        label="Candidate name"
-      />
-      <button className="px-3 py-1 bg-blue-500 rounded-md place-self-end" type="button" onClick={handleAddItem}>Add</button>
+      <div className="flex items-center gap-x-1 flex-1 pt-1">
+        <TextInput
+          type="text"
+          value={name}
+          onChange={(e) => setName(e)}
+          placeholder="Candidate name"
+          className="flex-1"
+          onKeyDown={handleEnterKeyDown}
+        />
+        <TextButton className="ring-0.5" type="button" onClick={handleAddItem}>Add</TextButton>
+      </div>
     </div>
   )
 }
-
-type TextInputProps = {
-  label?: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  type?: React.HTMLInputTypeAttribute;
-  className?: string;
-};
-
-const TextInput: React.FC<TextInputProps> = ({
-  label,
-  value,
-  onChange,
-  placeholder = "",
-  type = "text",
-  className = "",
-}) => {
-  return (
-    <div className="flex flex-col gap-1 w-full">
-      {label && (
-        <label className="text-sm font-medium text-gray-700">
-          {label}
-        </label>
-      )}
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-sm ${className}`}
-      />
-    </div>
-  );
-};
