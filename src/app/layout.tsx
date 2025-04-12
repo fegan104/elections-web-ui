@@ -81,9 +81,9 @@ const TopAppBar = () => {
 
   return (
     <div className="sticky w-full flex flex-row flex-shrink-0 align-middle justify-end px-4 py-2 mt-2 items-center space-x-2">
+      <h4 className="flex-1 justify-start">cascade-elections</h4>
       {user ? (
         <>
-          <h4 className="flex-1 justify-start">cascade-elections</h4>
           <TonalButton onClick={handleSignOut}>
             Sign Out
           </TonalButton>
@@ -123,8 +123,8 @@ const SideBar = () => {
 const BottomAppBar = () => {
   return (
     <div className=" bg-secondary-container rounded-t-md flex-1 px-4 flex items-center">
-      <a href="/view-elections"><TextButton className="text-on-surface">View My Elections</TextButton></a>
-      <a href="/create-election"><TextButton className="text-on-surface">Create an Election</TextButton></a>
+      <a href="/view-elections"><TextButton>View My Elections</TextButton></a>
+      <a href="/create-election"><TextButton>Create an Election</TextButton></a>
     </div>
   )
 };
