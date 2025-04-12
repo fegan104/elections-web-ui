@@ -1,7 +1,8 @@
 "use client"
+import { TonalButton } from "@/components/Buttons";
 import { useGetElectionWinners } from "@/data/electionsClient";
 import { ElectionWinnersResponse } from "@/data/model/models";
-import { Button, Card, CardContent, CircularProgress, List, ListItem, ListItemText, Typography } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { Suspense } from "react";
 
 export default function ViewResults() {
@@ -22,7 +23,6 @@ function ViewResultsScreen() {
 
   return (
     <div>
-      <Typography variant="h4">Winners:</Typography>
       {loading ? <CircularProgress /> : <></>}
       {response != null ? <ElectionResults data={response} onCloseElection={handleCloseElection} /> : <></>}
       {error ? (<h3> {error} </h3>) : <></>}
@@ -38,51 +38,57 @@ interface ElectionResultsProps {
 const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection }) => {
   const { election, voters, winners } = data
   return (
-    <Card style={{ margin: "16px", padding: "12px" }}>
-      <CardContent>
-        <Typography variant="h5">{election.name} - Results</Typography>
-        <Typography variant="subtitle1">Status: {election.isOpen ? "Open" : "Closed"}</Typography>
+    <div className="m-4 p-3 space-y-2">
+      <h2 className="text-lg font-bold">Results for {election.name}</h2>
 
-        <Typography variant="subtitle2">Candidates</Typography>
-        <List>
+      <div>
+        <span className="text-base font-bold">Status: </span>
+        <span className="text-base">{election.isOpen ? "Open" : "Closed"}</span>
+      </div>
+
+      <div>
+        <h4 className="font-bold">Candidates</h4>
+        <ul className="my-1">
           {election.candidates.map((candidate) => (
-            <ListItem key={candidate.id}>
-              <ListItemText primary={candidate.name} />
-            </ListItem>
+            <li key={candidate.id} className="text-sm">
+              -{candidate.name}
+            </li>
           ))}
-        </List>
+        </ul>
+      </div>
 
-        <Typography variant="subtitle2">Voters: {voters.length} total vote(s)</Typography>
-        <List>
+      <div>
+        <h4 className="font-bold">Voters: {voters.length} total vote(s)</h4>
+        <ul className="gap-4">
           {voters.map((voter) => (
-            <ListItem key={voter.id}>
-              <ListItemText primary={voter.name === "" ? `Anonymous (${voter.id})` : voter.name} />
-            </ListItem>
+            <li key={voter.id} className="text-sm">
+              -{voter.name === "" ? `Anonymous (${voter.id})` : voter.name}
+            </li>
           ))}
-        </List>
+        </ul>
+      </div>
 
-        <Typography variant="subtitle2">Winners</Typography>
-        <List>
+      <div>
+        <h4 className="font-bold">Winners</h4>
+        <ul>
+          <div className="text-sm">Ballots Exhausted {winners?.exhausted}</div>
           {winners?.winners.map((winner) => (
-            <ListItem key={winner.candidate.id}>
-              <ListItemText primary={`${winner.candidate.name} - ${winner.votes} votes`} />
-            </ListItem>
+            <li key={winner.candidate.id} className="text-sm">
+              -{`${winner.candidate.name}  ${winner.votes} votes`}
+            </li>
           ))}
-        </List>
+        </ul>
+      </div>
 
-        <Typography variant="subtitle2">Exhausted Ballots</Typography>
-        <Typography>{winners?.exhausted}</Typography>
+      {
+        winners == null ? (
+          <TonalButton onClick={onCloseElection}>
+            Close election to view full results.
+          </TonalButton>
+        ) : <></>
+      }
 
-        {
-          winners == null ? (
-            <Button onClick={onCloseElection}>
-              Close election to view full results.
-            </Button>
-          ) : <></>
-        }
-
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 

@@ -44,7 +44,7 @@ function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, on
     <li>
       <div
         ref={setNodeRef}
-        style={{ ...style, display: "flex" }}
+        style={{ ...style, display: "flex", touchAction: "none" }}
         {...attributes}
         {...listeners}
         className="p-2 bg-gray-200 rounded-lg cursor-grab gap-2"
@@ -145,7 +145,7 @@ function VoteScreen() {
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
               <SortableContext items={items} strategy={verticalListSortingStrategy}>
-                <ul className="space-y-2 p-4 border rounded-lg max-w-[250]">
+                <ul className="space-y-2 p-4 border rounded-lg max-w-[250px]">
                   {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank on the left hand side.</span> : <></>}
 
                   {items.map(c => (
