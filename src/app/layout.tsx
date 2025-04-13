@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <head>
         <title>cascade-elections</title>
         <meta name="description" content="A single tranferable vote elections web app." />
@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className={`
           ${geistSans.variable} ${geistMono.variable} 
           antialiased bg-background font-mono 
-          h-screen overflow-hidden flex flex-col`}>
+          h-full overflow-hidden flex flex-col`}>
 
         <Scaffold>
           {children}
@@ -50,7 +50,7 @@ function Scaffold({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="h-screen overflow-hidden flex flex-col">
+    <div className="overflow-hidden flex flex-col h-full">
       <TopAppBar />
 
       <div className="flex flex-1 overflow-hidden">
