@@ -21,7 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from '@mui/material/CircularProgress';
 import { ElectionCandidate } from "@/data/model/models";
 import { sendVote, useGetElection } from "@/data/electionsClient";
-import { TextButton, TonalButton } from "@/components/Buttons";
+import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { ErrorMessage } from "@/components/ErrorMessage";
