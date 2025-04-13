@@ -23,7 +23,7 @@ const ViewElectionsContent = () => {
   } else if (data) {
     return (
       <main>
-        <h4>View Elections</h4>
+        <h4>Elections</h4>
 
         <ElectionList elections={data} />
       </main>
@@ -33,42 +33,62 @@ const ViewElectionsContent = () => {
 
 const ElectionList: React.FC<{ elections: Election[] }> = ({ elections }) => {
   return (
-    <div>
-      {elections.map((election) => (
-        <div className="border-black p-2" key={election.id}>
-          <h5>{election.name}</h5>
-            <div className="text-base">Status: {election.isOpen ? "Open" : "Closed"}</div>
-            <div className="text-sm font-medium">Candidates</div>
-            <ul>
-              {election.candidates.map((candidate) => (
-                <li key={candidate.id}>
-                  {"-" + candidate.name}
-                </li>
-              ))}
-            </ul>
-            <div className="text-sm font-medium">Voters: {election.voters.length} total vote(s)</div>
-            <ul>
-              {election.voters.map((voter) => (
-                <li key={voter}>
-                  {voter}
-                </li>
-              ))}
-            </ul>
-            <div className="flex space-x-4">
+    <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4 p-4">
+      {elections.map((election) => <div key={election.id} className="bg-secondary-container ring-1 rounded-lg p-4">
+        <div className="space-y-3 flex flex-col h-full">
+
+          <ElectionStatus election={election} />
+
+          <div className="flex flex-1 flex-col place-content-end">
+
+            <div className="flex flex-wrap justify-end items-center gap-2">
+
+              <a href={`/vote?electionId=${election.id}`} className={`${!election.isOpen ? "hidden" : ""}`}>
+                <TextButton className="ring-primary ring-1"> {"Vote"} </TextButton>
+              </a>
 
               <a href={`/view-results?electionId=${election.id}`}>
-                <TextButton > {"View Results"} </TextButton>
+                <TextButton className="ring-primary ring-1"> {"View Results"} </TextButton>
               </a>
-              {
-                election.isOpen ?
-                  (<a href={`/vote?electionId=${election.id}`}>
-                    <TextButton > {"Vote"} </TextButton>
-                  </a>) : <></>
-              }
-
             </div>
+
+          </div>
         </div>
-      ))}
+      </div>)}
     </div>
-  );
+  )
 };
+
+const ElectionStatus: React.FC<{ election: Election }> = ({ election }) => {
+  return (
+    <div>
+      <h2 className="text-lg font-bold">{election.name}</h2>
+      <div>
+        <span className="text-base font-bold">Status: </span>
+        <span className="text-base">{election.isOpen ? "Open" : "Closed"}</span>
+      </div>
+
+      <div>
+        <h4 className="font-bold">Candidates</h4>
+        <ul className="my-1">
+          {election.candidates.map((candidate) => (
+            <li key={candidate.id} className="text-sm">
+              -{candidate.name}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h4 className="font-bold">Voters: {election.voters.length} total vote(s)</h4>
+        <ul className="gap-4">
+          {election.voters.map((voterName) => (
+            <li key={voterName} className="text-sm">
+              -{voterName === "" ? `Anonymous` : voterName}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}

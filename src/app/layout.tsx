@@ -123,8 +123,8 @@ const SideBar = () => {
 const BottomAppBar = () => {
   return (
     <div className=" bg-secondary-container rounded-t-md flex-1 px-4 flex items-center">
-      <a href="/view-elections"><TextButton>View My Elections</TextButton></a>
-      <a href="/create-election"><TextButton>Create an Election</TextButton></a>
+      <a href="/view-elections" className="flex-1"><TextButton>View My Elections</TextButton></a>
+      <a href="/create-election" className="flex-1"><TextButton>Create an Election</TextButton></a>
     </div>
   )
 };

@@ -121,10 +121,9 @@ function VoteScreen() {
     )
   } else if (election !== null) {
     return (
-      <div className="grid items-center justify-items-center">
-        <main className="flex gap-8">
-
-          {
+      <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-4 p-4">
+        
+        {
             (submissionState === false) ? (<h3>There was a problem submitting youre ballot. Try again.</h3>) : <></>
           }
 
@@ -145,7 +144,7 @@ function VoteScreen() {
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
               <SortableContext items={items} strategy={verticalListSortingStrategy}>
-                <ul className="space-y-2 p-4 border rounded-lg max-w-[250px]">
+                <ul className="space-y-2 p-4 border rounded-lg w-full">
                   {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank on the left hand side.</span> : <></>}
 
                   {items.map(c => (
@@ -159,7 +158,6 @@ function VoteScreen() {
               Cast Vote!
             </TonalButton>
           </div>
-        </main>
       </div>
     )
   }
