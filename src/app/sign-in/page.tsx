@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { TextInput } from "@/components/TextInput";
 import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 export default function SignIn() {
   const currentUser = useFirebaseUser()
@@ -46,7 +47,7 @@ export default function SignIn() {
             <TonalButton type="submit">Sign In</TonalButton>
           </div>
         </form>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </Card>
     </div>
   );

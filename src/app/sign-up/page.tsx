@@ -6,6 +6,7 @@ import useFirebaseUser from "@/data/useFirebaseUser";
 import { TextInput } from "@/components/TextInput";
 import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 export default function CreateAccount() {
   const currentUser = useFirebaseUser()
@@ -46,7 +47,7 @@ export default function CreateAccount() {
             <TonalButton type="submit">Create Account</TonalButton>
           </div>
         </form>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </Card>
     </div>
   )
