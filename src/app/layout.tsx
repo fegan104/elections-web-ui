@@ -2,7 +2,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import useFirebaseUser from "@/data/useFirebaseUser";
-import { Avatar, Button } from "@mui/material";
+import { Avatar } from "@mui/material";
 import { auth, signOut } from "@/data/firebaseClient"
 import { TextButton, TonalButton } from "@/components/Buttons";
 
@@ -92,10 +92,10 @@ const TopAppBar = () => {
       ) : (
         <>
           <a href="/sign-in">
-            <Button color="inherit">Sign In</Button>
+            <TextButton>Sign In</TextButton>
           </a>
           <a href="/sign-up">
-            <Button color="inherit">Sign Up</Button>
+            <TextButton>Sign Up</TextButton>
           </a>
         </>
       )}

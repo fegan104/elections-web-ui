@@ -1,5 +1,6 @@
 "use client"
 import { TextButton, TonalButton } from "@/components/Buttons"
+import { Card } from "@/components/Card"
 import { TextInput } from "@/components/TextInput"
 import { createNewElection } from "@/data/electionsClient"
 import { useRouter } from "next/navigation"
@@ -23,8 +24,7 @@ export default function SignIn() {
 
   return (
     <div className="items-center justify-items-center">
-      <main className="flex flex-col bg-white rounded-md p-4 max-w-1/4">
-
+      <Card>
         <form action={submitForm} className="space-y-4">
 
           <TextInput
@@ -39,7 +39,7 @@ export default function SignIn() {
 
           <TonalButton type="submit" className="w-full">Save</TonalButton>
         </form>
-      </main>
+      </Card>
     </div>
   )
 }

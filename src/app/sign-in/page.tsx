@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { auth, signInWithEmailAndPassword } from "../../data/firebaseClient";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { useRouter } from "next/navigation";
-import { TextField } from "@mui/material";
+import { TextInput } from "@/components/TextInput";
+import { TonalButton } from "@/components/Buttons";
+import { Card } from "@/components/Card";
 
 export default function SignIn() {
   const currentUser = useFirebaseUser()
@@ -34,14 +36,18 @@ export default function SignIn() {
   };
 
   return (
-    <div>
-      <h2>Enter you account details</h2>
-      <form action={handleSignIn}>
-        <TextField variant="outlined" id="email"value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required/>
-        <TextField variant="outlined" id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required/>
-        <button type="submit">Sign In</button>
-      </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="w-full flex justify-center">
+      <Card className="space-y-4 w-fit">
+        <h2>Enter you account details</h2>
+        <form action={handleSignIn} className="space-y-4">
+          <TextInput value={email} onChange={(e) => setEmail(e)} placeholder="Email" />
+          <TextInput type="password" value={password} onChange={(e) => setPassword(e)} placeholder="Password" />
+          <div className="flex w-full justify-end">
+            <TonalButton type="submit">Sign In</TonalButton>
+          </div>
+        </form>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+      </Card>
     </div>
   );
 }
