@@ -21,8 +21,10 @@ import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from '@mui/material/CircularProgress';
 import { ElectionCandidate } from "@/data/model/models";
 import { sendVote, useGetElection } from "@/data/electionsClient";
-import { TonalButton } from "@/components/Buttons";
+import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
+import useFirebaseUser from "@/data/useFirebaseUser";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
   return (
@@ -64,6 +66,7 @@ function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, on
 
 function VoteScreen() {
   const { election, loading, error } = useGetElection()
+  const user = useFirebaseUser()
   const [items, setItems] = useState<ElectionCandidate[]>([]);
   const [submissionState, setSubmissionState] = useState<boolean | null>(null)
 
@@ -117,55 +120,57 @@ function VoteScreen() {
     return (
       <div>
         <h3>Hmmn we can&apos;t find that election 🤔</h3>
-        <h4>{error}</h4>
+        <ErrorMessage>
+          {error}
+        </ErrorMessage>
       </div>
     )
   } else if (election !== null) {
     return (
-      <div className="flex justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-fill md:w-fit">
+      <div className="space-y-2">
+        <div className="flex justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-fill md:w-fit">
+            <div className="w-[256px]">
+              <Card className="h-full flex-col space-y-2 w-full">
+                <h4>Available Candidates</h4>
+                <ul className="space-y-2 p-4 border rounded-lg w-full">
+                  {[...election.candidates].map(item => (
+                    <li className={`px-2 py-1 ${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`} onClick={() => onAddCandidateToRankingList(item)} key={item.id}>{item.name}</li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
 
-          {
-            (submissionState === false) ? (<h3>There was a problem submitting youre ballot. Try again.</h3>) : <></>
-          }
+            {(loading === true) ? <CircularProgress /> : <></>}
 
-          <div className="w-[256px]">
-            <Card className="h-full flex-col space-y-2 w-full">
-              <h4>Available Candidates</h4>
-              <ul className="space-y-2 p-4 border rounded-lg w-full">
-                {[...election.candidates].map(item => (
-                  <li className={`px-2 py-1 ${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`} onClick={() => onAddCandidateToRankingList(item)} key={item.id}>{item.name}</li>
-                ))}
-              </ul>
-            </Card>
+            <div className="flex flex-col items-center w-[256px]">
+
+              <Card className="space-y-2 h-full w-full">
+                <h4>Your Ballot</h4>
+
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+                  <SortableContext items={items} strategy={verticalListSortingStrategy}>
+                    <ul className="space-y-2 p-4 border rounded-lg w-full">
+                      {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank on the left hand side.</span> : <></>}
+
+                      {items.map(c => (
+                        <SortableItem key={c.id} candidate={c} onClick={() => removeSelecteditem(c.id)} />
+                      ))}
+                    </ul>
+                  </SortableContext>
+                </DndContext>
+
+                <TonalButton onClick={castVote} disabled={user == null}>
+                  Cast Vote
+                </TonalButton>
+              </Card>
+            </div>
           </div>
 
-          {(loading === true) ? <CircularProgress /> : <></>}
-
-          <div className="flex flex-col items-center w-[256px]">
-
-            <Card className="space-y-2 h-full w-full">
-              <h4>Your Ballot</h4>
-
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
-                <SortableContext items={items} strategy={verticalListSortingStrategy}>
-                  <ul className="space-y-2 p-4 border rounded-lg w-full">
-                    {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank on the left hand side.</span> : <></>}
-
-                    {items.map(c => (
-                      <SortableItem key={c.id} candidate={c} onClick={() => removeSelecteditem(c.id)} />
-                    ))}
-                  </ul>
-                </SortableContext>
-              </DndContext>
-
-              <TonalButton onClick={castVote}>
-                Cast Vote
-              </TonalButton>
-            </Card>
-          </div>
         </div>
-
+        <h3 className={`flex justify-center ${(submissionState === false) ? "" : "hidden"}`}>
+          There was a problem submitting youre ballot. Try again.
+        </h3>
       </div>
     )
   }

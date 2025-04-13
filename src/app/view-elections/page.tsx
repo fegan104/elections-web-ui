@@ -4,6 +4,7 @@ import { CircularProgress } from "@mui/material";
 import { Election } from "@/data/model/models"
 import { Suspense } from 'react'
 import { TextButton } from "@/components/Buttons";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 export default function ViewElections() {
   return (
@@ -19,7 +20,11 @@ const ViewElectionsContent = () => {
   if (loading) {
     return (<CircularProgress />)
   } else if (error) {
-    return (<h6>{error}</h6>)
+    return (
+      <ErrorMessage>
+        {error}
+      </ErrorMessage>
+    )
   } else if (data) {
     return (
       <main>

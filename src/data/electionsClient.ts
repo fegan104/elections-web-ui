@@ -111,7 +111,7 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
         const idToken = await user?.getIdToken()
 
         if (idToken === undefined) {
-          setError("No idToken");
+          setError("You must be signed in to complete that action.");
         } else {
           const headers = {
             Authorization: `Bearer ${idToken}`,
@@ -149,25 +149,17 @@ export function useGetElection(): { election: Election | null; loading: boolean;
   const [election, setElection] = useState<Election | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const user = useFirebaseUser()
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const idToken = await user?.getIdToken()
-
-        if (idToken === undefined) {
-          setError("No idToken");
-        } else if (electionId === null) {
+        if (electionId === null) {
           setError("No electionId");
         } else {
-          const headers = {
-            Authorization: `Bearer ${idToken}`,
-          };
           console.log(`Loading election id: ${electionId}`)
-          const response = await fetch(`${BASE_URL}elections/${electionId}`, { headers })
+          const response = await fetch(`${BASE_URL}elections/${electionId}`)
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -188,7 +180,7 @@ export function useGetElection(): { election: Election | null; loading: boolean;
     };
 
     fetchData();
-  }, [electionId, user]);
+  }, [electionId]);
 
   return { election, loading, error };
 }
