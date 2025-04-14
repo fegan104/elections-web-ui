@@ -5,6 +5,8 @@ import useFirebaseUser from "@/data/useFirebaseUser";
 import { Avatar } from "@mui/material";
 import { auth, signOut } from "@/data/firebaseClient"
 import { TextButton, TonalButton } from "@/components/Buttons";
+import { Home, PlusCircle, Vote } from "lucide-react";
+import { useState } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -108,7 +110,7 @@ const SideBar = () => {
   return (
     <div className="p-4 justify-items-center">
       <a href="/create-election">
-        <TonalButton>➕ Create an Election</TonalButton>
+        <TonalButton><PlusCircle size={24} className="pe-1" /> Create an Election</TonalButton>
       </a>
 
       <div className="pt-4 justify-center">
@@ -120,11 +122,52 @@ const SideBar = () => {
   )
 };
 
-const BottomAppBar = () => {
+function BottomAppBar() {
   return (
-    <div className=" bg-secondary-container rounded-t-md flex-1 px-4 flex items-center">
-      <a href="/view-elections" className="flex-1"><TextButton>View My Elections</TextButton></a>
-      <a href="/create-election" className="flex-1"><TextButton>Create an Election</TextButton></a>
+    <div className="bg-secondary-container rounded-t-md flex justify-around items-center w-full h-[80px] align-middle">
+      <NavItem
+        href="/view-elections"
+        icon={<Vote size={24} />}
+        label="My Elections"
+        active={false}
+        onClick={() => { }}
+      />
+      <NavItem
+        href="/create-election"
+        icon={<PlusCircle size={24} />}
+        label="Create"
+        active={true}
+        onClick={() => { }}
+      />
     </div>
-  )
-};
+  );
+}
+
+function NavItem({
+  href,
+  icon,
+  label,
+  active,
+  onClick,
+}: {
+  href: string,
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+  onClick: (link: string) => void;
+}) {
+  return (
+    <a href={href}>
+      <button
+        onClick={() => onClick(href)}
+        className={`flex flex-col items-center justify-center pt-1`}
+      >
+        <span className={`w-16 flex items-center justify-center px-4 h-8 rounded-full transition-colors 
+        ${active ? 'bg-blue-200 text-blue-500 font-semibold' : 'text-gray-500'}`}>
+          {icon}
+        </span>
+        <span className="text-xs mb-4">{label}</span>
+      </button>
+    </a>
+  );
+}

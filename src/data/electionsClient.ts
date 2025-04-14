@@ -125,7 +125,6 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
             setData([]);
           } else {
             const jsonData = await response.json();
-            console.log(`Response: ${response.status} ${jsonData}`)
             setData(jsonData);
           }
         }
@@ -158,7 +157,6 @@ export function useGetElection(): { election: Election | null; loading: boolean;
         if (electionId === null) {
           setError("No electionId");
         } else {
-          console.log(`Loading election id: ${electionId}`)
           const response = await fetch(`${BASE_URL}elections/${electionId}`)
 
           if (!response.ok) {
@@ -219,7 +217,6 @@ export function useGetElectionWinners(): {
         if (electionId === null) {
           setError("No electionId");
         } else {
-          console.log(`Loading election id: ${electionId}`)
           const response = await fetch(`${BASE_URL}elections/results?electionId=${electionId}&numWinners=1`)
 
           if (!response.ok) {
