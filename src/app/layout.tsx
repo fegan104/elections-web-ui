@@ -5,8 +5,7 @@ import useFirebaseUser from "@/data/useFirebaseUser";
 import { Avatar } from "@mui/material";
 import { auth, signOut } from "@/data/firebaseClient"
 import { TextButton, TonalButton } from "@/components/Buttons";
-import { Home, PlusCircle, Vote } from "lucide-react";
-import { useState } from "react";
+import { PlusCircle, Vote } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
