@@ -9,7 +9,7 @@ import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
 
 export default function SignIn() {
-  const currentUser = useFirebaseUser()
+  const { user } = useFirebaseUser()
   const router = useRouter()
 
   const [email, setEmail] = useState("");
@@ -17,10 +17,10 @@ export default function SignIn() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (currentUser != null) {
-      router.replace("/view-elections")
+    if (user != null) {
+      router.replace("/")
     }
-  }, [currentUser, router])
+  }, [user, router])
 
   const handleSignIn = async () => {
     try {

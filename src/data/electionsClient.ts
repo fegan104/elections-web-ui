@@ -101,7 +101,7 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
   const [data, setData] = useState<Election[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { status, user } = useFirebaseUser()
+  const { user } = useFirebaseUser()
 
   useEffect(() => {
     const fetchData = async () => {

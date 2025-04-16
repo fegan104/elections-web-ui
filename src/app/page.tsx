@@ -35,7 +35,7 @@ const LandingPage = () => {
   )
 }
 
-export function ViewElections() {
+function ViewElections() {
   return (
     <Suspense>
       <ViewElectionsContent />

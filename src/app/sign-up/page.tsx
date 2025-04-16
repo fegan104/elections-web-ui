@@ -17,7 +17,7 @@ export default function CreateAccount() {
 
   useEffect(() => {
     if (user != null) {
-      router.replace("/view-elections")
+      router.replace("/")
     }
   }, [user, router])
 

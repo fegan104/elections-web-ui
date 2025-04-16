@@ -4,8 +4,8 @@ import "./globals.css";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { Avatar } from "@mui/material";
 import { auth, signOut } from "@/data/firebaseClient"
-import FloatingActionButton, { TextButton, TonalButton } from "@/components/Buttons";
-import { Plus, PlusCircle, Vote } from "lucide-react";
+import { TextButton, TonalButton } from "@/components/Buttons";
+import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 
 const geistSans = Geist({
