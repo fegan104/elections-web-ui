@@ -96,6 +96,7 @@ function VoteScreen() {
 
   const onAddCandidateToRankingList = (item: ElectionCandidate) => {
     if (items.some(c => c.id === item.id)) {
+      removeSelecteditem(item.id)
       return
     }
     setItems([...items, item])

@@ -4,8 +4,9 @@ import "./globals.css";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { Avatar } from "@mui/material";
 import { auth, signOut } from "@/data/firebaseClient"
-import { TextButton, TonalButton } from "@/components/Buttons";
-import { PlusCircle, Vote } from "lucide-react";
+import FloatingActionButton, { TextButton, TonalButton } from "@/components/Buttons";
+import { Plus, PlusCircle, Vote } from "lucide-react";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,9 +65,11 @@ function Scaffold({
             {children}
           </div>
 
-          <div className="flex md:hidden w-full h-16">
-            <BottomAppBar />
-          </div>
+          {/* <div className="md:hidden">
+            <a href="/create-election">
+              <FloatingActionButton label={"Create"} icon={<Plus className="size-6" />}/>
+            </a>
+          </div> */}
         </div>
       </div>
     </div>
@@ -74,7 +77,7 @@ function Scaffold({
 }
 
 const TopAppBar = () => {
-  const user = useFirebaseUser();
+  const { user } = useFirebaseUser();
 
   const handleSignOut = () => {
     signOut(auth)
@@ -113,60 +116,60 @@ const SideBar = () => {
       </a>
 
       <div className="pt-4 justify-center">
-        <a href="/view-elections">
+        <Link href="/">
           <TextButton className="text-on-surface">View My Elections</TextButton>
-        </a>
+        </Link>
       </div>
     </div>
   )
 };
 
-function BottomAppBar() {
-  return (
-    <div className="bg-secondary-container rounded-t-md flex justify-around items-center w-full h-[80px] align-middle">
-      <NavItem
-        href="/view-elections"
-        icon={<Vote size={24} />}
-        label="My Elections"
-        active={false}
-        onClick={() => { }}
-      />
-      <NavItem
-        href="/create-election"
-        icon={<PlusCircle size={24} />}
-        label="Create"
-        active={true}
-        onClick={() => { }}
-      />
-    </div>
-  );
-}
+// function BottomAppBar() {
+//   return (
+//     <div className="bg-secondary-container rounded-t-md flex justify-around items-center w-full h-[80px] align-middle">
+//       <NavItem
+//         href="/"
+//         icon={<Vote size={24} />}
+//         label="My Elections"
+//         active={false}
+//         onClick={() => { }}
+//       />
+//       <NavItem
+//         href="/create-election"
+//         icon={<PlusCircle size={24} />}
+//         label="Create"
+//         active={true}
+//         onClick={() => { }}
+//       />
+//     </div>
+//   );
+// }
 
-function NavItem({
-  href,
-  icon,
-  label,
-  active,
-  onClick,
-}: {
-  href: string,
-  icon: React.ReactNode;
-  label: string;
-  active: boolean;
-  onClick: (link: string) => void;
-}) {
-  return (
-    <a href={href}>
-      <button
-        onClick={() => onClick(href)}
-        className={`flex flex-col items-center justify-center pt-1`}
-      >
-        <span className={`w-16 flex items-center justify-center px-4 h-8 rounded-full transition-colors 
-        ${active ? 'bg-blue-200 text-blue-500 font-semibold' : 'text-gray-500'}`}>
-          {icon}
-        </span>
-        <span className="text-xs mb-4">{label}</span>
-      </button>
-    </a>
-  );
-}
+// function NavItem({
+//   href,
+//   icon,
+//   label,
+//   active,
+//   onClick,
+// }: {
+//   href: string,
+//   icon: React.ReactNode;
+//   label: string;
+//   active: boolean;
+//   onClick: (link: string) => void;
+// }) {
+//   return (
+//     <a href={href}>
+//       <button
+//         onClick={() => onClick(href)}
+//         className={`flex flex-col items-center justify-center pt-1`}
+//       >
+//         <span className={`w-16 flex items-center justify-center px-4 h-8 rounded-full transition-colors 
+//         ${active ? 'bg-blue-200 text-blue-500 font-semibold' : 'text-gray-500'}`}>
+//           {icon}
+//         </span>
+//         <span className="text-xs mb-4">{label}</span>
+//       </button>
+//     </a>
+//   );
+// }

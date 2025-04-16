@@ -9,17 +9,17 @@ import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
 
 export default function CreateAccount() {
-  const currentUser = useFirebaseUser()
+  const { user } = useFirebaseUser()
   const router = useRouter()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (currentUser != null) {
+    if (user != null) {
       router.replace("/view-elections")
     }
-  }, [currentUser, router])
+  }, [user, router])
 
   const handleSignUp = async () => {
     try {

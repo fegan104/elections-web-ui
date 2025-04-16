@@ -2,19 +2,32 @@ import { useEffect, useState } from "react";
 import { auth } from "./firebaseClient";
 import { User } from "firebase/auth";
 
-const useFirebaseUser = (): User | null => {
-  const [user, setUser] = useState<User | null>(null);
+type AuthState =
+  | { status: 'loading'; user: null }
+  | { status: 'unauthenticated'; user: null }
+  | { status: 'authenticated'; user: User };
+
+
+const useFirebaseUser = (): AuthState => {
+  const [authState, setAuthState] = useState<AuthState>({
+    status: 'loading',
+    user: null,
+  });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user); // Update state when user logs in or out
+      if (user) {
+        setAuthState({ status: 'authenticated', user });
+      } else {
+        setAuthState({ status: 'unauthenticated', user: null });
+      }
     });
 
     // Clean up the subscription on unmount
     return () => unsubscribe();
   }, []);
 
-  return user;
+  return authState;
 };
 
 export default useFirebaseUser;

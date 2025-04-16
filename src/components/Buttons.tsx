@@ -61,3 +61,35 @@ export const TonalButton: React.FC<ButtonProps> = ({
     </button>
   );
 };
+
+interface FloatingActionButtonProps {
+  onClick?: () => void;
+  icon?: React.ReactNode;
+  label?: string; // optional for extended FAB
+}
+
+const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
+  onClick,
+  icon,
+  label,
+}) => {
+  const isExtended = Boolean(label);
+
+  return (
+    <button
+      onClick={onClick}
+      className={`fixed bottom-6 right-6 z-50 
+        flex items-center justify-center gap-3
+        transition-shadow hover:shadow-lg
+        rounded-full px-5 py-3
+        bg-primary text-white shadow-md
+        ${isExtended ? "rounded-full" : "w-14 h-14 p-0"}
+      `}
+    >
+      {icon}
+      {isExtended && <span className="text-base font-medium">{label}</span>}
+    </button>
+  );
+};
+
+export default FloatingActionButton;
