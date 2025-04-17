@@ -79,7 +79,6 @@ const LandingPage = () => {
       </section>
 
       <div className="text-center pt-4 space-y-2">
-        <p className="py-2">Get started</p>
         <a href="/sign-up">
           <TonalButton className="w-full">Create an Account</TonalButton>
         </a>
