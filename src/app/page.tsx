@@ -2,8 +2,7 @@
 import { useGetCurrentUsersElections } from "@/data/electionsClient"
 import { CircularProgress } from "@mui/material";
 import { Election } from "@/data/model/models"
-import { Suspense } from 'react'
-import FloatingActionButton, { TextButton } from "@/components/Buttons";
+import FloatingActionButton, { TextButton, TonalButton } from "@/components/Buttons";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { Plus } from "lucide-react";
@@ -24,26 +23,76 @@ export default function Home() {
 
 const LandingPage = () => {
   return (
-    <div>
-      <h2 className="text-lg">🗳️ Run Better Elections with Single Transferable Vote (STV)</h2>
-      <div className="py-2">
-        Fair. Flexible. Easy to Use.
+    <main className="max-w-3xl mx-auto px-4 py-12 space-y-10 text-gray-800">
+      <section className="space-y-4 text-center">
+        <h1 className="text-3xl font-bold">Run Fair Elections with STV</h1>
+        <p>
+          This tool helps you run elections using{" "}
+          <span className="font-semibold">Single Transferable Vote (STV)</span> — a voting method that gives everyone a fair say and leads to more balanced results.
+        </p>
+      </section>
 
-        Whether you&apos;re electing a student council, committee, or team captain, STV ensures everyone&apos;s voice is heard—not just the loudest one. Our tool makes it effortless.
+      <section className="space-y-2">
+        <h2 className="text-xl font-semibold">What is STV?</h2>
+        <p>
+          With STV, voters <strong>rank candidates</strong> in order of preference.
+        </p>
+        <blockquote className="bg-gray-50 border-l-4 border-gray-300 p-3 italic">
+          1. Jamie<br />
+          2. Alex<br />
+          3. Taylor
+        </blockquote>
+        <p>
+          This helps make sure your vote still counts, even if your top choice doesn’t win.
+        </p>
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-xl font-semibold">How it works</h2>
+        <ul className="list-disc list-inside space-y-1">
+          <li>Voters rank the candidates</li>
+          <li>A quota is calculated</li>
+          <li>Candidates who reach the quota are elected</li>
+          <li>Extra and eliminated votes are transferred</li>
+          <li>This repeats until all seats are filled</li>
+        </ul>
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-xl font-semibold">Why use it?</h2>
+        <ul className="list-disc list-inside space-y-1">
+          <li>More fair and representative</li>
+          <li>Less wasted votes</li>
+          <li>Encourages honest rankings</li>
+          <li>Great for groups, teams, and councils</li>
+        </ul>
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-xl font-semibold">How to get started</h2>
+        <ol className="list-decimal list-inside space-y-1">
+          <li>Create your election</li>
+          <li>Add candidates</li>
+          <li>Share the voting link</li>
+          <li>See the results when voting ends</li>
+        </ol>
+      </section>
+
+      <div className="text-center pt-4 space-y-2">
+        <p className="py-2">Get started</p>
+        <a href="/sign-up">
+          <TonalButton className="w-full">Create an Account</TonalButton>
+        </a>
+        <p>or</p>
+        <a href="/about">
+          <TextButton className="w-full">Learn how STV works in detail</TextButton>
+        </a>
       </div>
-    </div>
-  )
-}
+    </main>
+  );
+};
 
-function ViewElections() {
-  return (
-    <Suspense>
-      <ViewElectionsContent />
-    </Suspense>
-  )
-}
-
-const ViewElectionsContent = () => {
+const ViewElections = () => {
   const { data, loading, error } = useGetCurrentUsersElections()
 
   if (loading) {
@@ -62,10 +111,10 @@ const ViewElectionsContent = () => {
         <ElectionList elections={data} />
 
         <div className="md:hidden">
-            <a href="/create-election">
-              <FloatingActionButton label={"Create"} icon={<Plus className="size-6" />}/>
-            </a>
-          </div>
+          <a href="/create-election">
+            <FloatingActionButton label={"Create"} icon={<Plus className="size-6" />} />
+          </a>
+        </div>
       </main>
     )
   }

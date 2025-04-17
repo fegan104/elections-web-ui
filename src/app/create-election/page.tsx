@@ -30,6 +30,7 @@ export default function SignIn() {
           <TextInput
             className=""
             type="text"
+            label="Election Details"
             placeholder="Election Name"
             value={getElectionName}
             onChange={it => setElectionName(it)}
@@ -66,7 +67,7 @@ const NameList: React.FC<{
 
   return (
     <div className="flex flex-col w-full">
-      <h6>Candidates</h6>
+      <h6 className="text-sm font-medium text-gray-700">Candidates</h6>
       <ul>
         {names.map((item, index) => (
           <li key={index}>-{item}</li>
