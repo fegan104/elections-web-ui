@@ -13,8 +13,10 @@ export default function CreateAccount() {
   const router = useRouter()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [verifiedPassword, setVerifiedPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  //If a user is already signed in just send them home
   useEffect(() => {
     if (user != null) {
       router.replace("/")
@@ -23,9 +25,13 @@ export default function CreateAccount() {
 
   const handleSignUp = async () => {
     try {
+      if (password != verifiedPassword) {
+        setError("Oops! The passwords don't match");
+        return
+      }
       const response = await createUser({ email, password })
       if (!response.ok) {
-        throw Error(`HTTP failue code=${response.status}}`)
+        throw Error(`Network error HTTP code=${response.status}}`)
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -38,11 +44,12 @@ export default function CreateAccount() {
 
   return (
     <div className="w-full flex justify-center">
-      <Card className="space-y-4 md:w-fit sm:w-full">
+      <Card className="space-y-4 md:w-[512px] sm:w-full">
         <h2>Register a new account</h2>
         <form action={handleSignUp} className="space-y-4">
-          <TextInput value={email} onChange={(e) => setEmail(e)} placeholder="Email" />
-          <TextInput type="password" value={password} onChange={(e) => setPassword(e)} placeholder="Password" />
+          <TextInput value={email} onChange={(e) => setEmail(e)} label="Email" />
+          <TextInput type="password" value={password} onChange={(e) => setPassword(e)} label="Password" />
+          <TextInput type="password" value={verifiedPassword} onChange={(e) => setVerifiedPassword(e)} label="Confirm Password" />
           <div className="flex w-full justify-end">
             <TonalButton type="submit">Create Account</TonalButton>
           </div>

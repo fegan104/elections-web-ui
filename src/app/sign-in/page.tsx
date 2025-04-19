@@ -38,11 +38,11 @@ export default function SignIn() {
 
   return (
     <div className="w-full flex justify-center">
-      <Card className="space-y-4 w-fit">
+      <Card className="space-y-4 md:w-[512px] sm:w-full">
         <h2>Enter you account details</h2>
         <form action={handleSignIn} className="space-y-4">
-          <TextInput value={email} onChange={(e) => setEmail(e)} placeholder="Email" />
-          <TextInput type="password" value={password} onChange={(e) => setPassword(e)} placeholder="Password" />
+          <TextInput value={email} onChange={(e) => setEmail(e)} label="Email" />
+          <TextInput type="password" value={password} onChange={(e) => setPassword(e)} label="Password" />
           <div className="flex w-full justify-end">
             <TonalButton type="submit">Sign In</TonalButton>
           </div>
