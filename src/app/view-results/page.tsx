@@ -4,7 +4,7 @@ import { Card } from "@/components/Card";
 import { useGetElectionWinners } from "@/data/electionsClient";
 import { ElectionWinnersResponse } from "@/data/model/models";
 import { CircularProgress } from "@mui/material";
-import { forwardRef, Ref, Suspense, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, Ref, Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 export default function ViewResults() {
 
@@ -99,10 +99,11 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
               Close election
             </TonalButton>
 
-            <ShareDialog textToCopy={`https://elections.frankegan.com/vote?electionId=${election.id}`} ref={dialogRef} />
           </div>
         </div>
       </Card>
+
+      <ShareDialog textToCopy={`https://elections.frankegan.com/vote?electionId=${election.id}`} ref={dialogRef} />
     </div>
   );
 };
@@ -128,6 +129,21 @@ const ShareDialog = forwardRef(function AppDialog(
     close: () => dialogRef.current?.close(),
   }));
 
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const handleClick = (e: MouseEvent) => {
+      // If clicked directly on the <dialog> element (the backdrop), close it
+      if (e.target === dialog) {
+        dialog.close();
+      }
+    };
+
+    dialog.addEventListener("click", handleClick);
+    return () => dialog.removeEventListener("click", handleClick);
+  }, []);
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(textToCopy);
@@ -141,14 +157,14 @@ const ShareDialog = forwardRef(function AppDialog(
   return (
     <dialog
       ref={dialogRef}
-      className="rounded-xl shadow-lg p-6 max-w-md w-full backdrop:bg-black/50"
+      className="rounded-xl shadow-lg p-6 mx-6 sm:mx-auto max-w-md backdrop:bg-black/50"
     >
       <h2 className="text-xl font-semibold mb-4">Copy to Clipboard</h2>
       <div className="bg-gray-100 rounded p-2 mb-4 text-sm break-all">
         {textToCopy}
       </div>
       <div className="flex justify-end space-x-2">
-        <TextButton className="ring-1" onClick={() => dialogRef.current?.close()}        >
+        <TextButton className="ring-1" onClick={() => dialogRef.current?.close()}>
           Close
         </TextButton>
         <TonalButton onClick={handleCopy}>
