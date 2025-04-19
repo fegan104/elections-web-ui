@@ -12,8 +12,9 @@ export default {
       colors: {
         background: colors.neutral[50],
         foreground: colors.neutral[900],
-        "primary": colors.blue[500],
+        "primary": colors.blue[700],
         "on-surface": "#121212",
+        "primary-container": colors.blue[100],
         "secondary-container": "#DCE2F9",
         "on-secondary-container": "#151B2C", 
       },

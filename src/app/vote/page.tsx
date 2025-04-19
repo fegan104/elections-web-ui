@@ -66,7 +66,7 @@ function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, on
 
 function VoteScreen() {
   const { election, loading, error } = useGetElection()
-  const user = useFirebaseUser()
+  const { status, user } = useFirebaseUser()
   const [items, setItems] = useState<ElectionCandidate[]>([]);
   const [submissionState, setSubmissionState] = useState<boolean | null>(null)
 
@@ -113,17 +113,14 @@ function VoteScreen() {
 
   if (submissionState === true) {
     return (
-      <div>
+      <div className="flex justify-center">
         <h3>Your ballot was submitted successfully ✅</h3>
       </div>
     )
   } else if (error !== null) {
     return (
       <div>
-        <h3>Hmmn we can&apos;t find that election 🤔</h3>
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
+        <h3 className="flex justify-center">Hmmn we can&apos;t find that election 🤔</h3>
       </div>
     )
   } else if (election !== null) {
@@ -152,7 +149,7 @@ function VoteScreen() {
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
                   <SortableContext items={items} strategy={verticalListSortingStrategy}>
                     <ul className="space-y-2 p-4 border rounded-lg w-full">
-                      {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank on the left hand side.</span> : <></>}
+                      {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank from the list of Available Candidates.</span> : <></>}
 
                       {items.map(c => (
                         <SortableItem key={c.id} candidate={c} onClick={() => removeSelecteditem(c.id)} />
@@ -161,7 +158,14 @@ function VoteScreen() {
                   </SortableContext>
                 </DndContext>
 
-                <TonalButton onClick={castVote} disabled={user == null}>
+                <div className={`${(status === 'unauthenticated') ? "" : "hidden"}`}>
+                  <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
+                  <a href="/sign-up">
+                    <TonalButton className="w-full">Create an Account</TonalButton>
+                  </a>
+                </div>
+
+                <TonalButton className={`w-full ${(status === 'authenticated') ? "" : "hidden"}`} onClick={castVote} disabled={(user == null) || (items.length == 0)}>
                   Cast Vote
                 </TonalButton>
               </Card>
@@ -169,9 +173,9 @@ function VoteScreen() {
           </div>
 
         </div>
-        <h3 className={`flex justify-center ${(submissionState === false) ? "" : "hidden"}`}>
+        <div className={`flex justify-center ${(submissionState === false) ? "" : "hidden"}`}>
           There was a problem submitting youre ballot. Try again.
-        </h3>
+        </div>
       </div>
     )
   }

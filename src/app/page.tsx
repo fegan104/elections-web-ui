@@ -5,7 +5,7 @@ import { Election } from "@/data/model/models"
 import FloatingActionButton, { TextButton, TonalButton } from "@/components/Buttons";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import useFirebaseUser from "@/data/useFirebaseUser";
-import { Plus } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 
 export default function Home() {
   const { status } = useFirebaseUser()
@@ -105,13 +105,13 @@ const ViewElections = () => {
   } else if (data) {
     return (
       <main className="pb-12">
-        <h4>Elections</h4>
+        <h1 className="text-lg px-4">Elections</h1>
 
         <ElectionList elections={data} />
 
         <div className="md:hidden">
           <a href="/create-election">
-            <FloatingActionButton label={"Create"} icon={<Plus className="size-6" />} />
+            <FloatingActionButton label={"Create"} icon={<CirclePlus className="size-6" />} />
           </a>
         </div>
       </main>
@@ -122,7 +122,7 @@ const ViewElections = () => {
 const ElectionList: React.FC<{ elections: Election[] }> = ({ elections }) => {
   return (
     <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4 p-4">
-      {elections.map((election) => <div key={election.id} className="bg-secondary-container ring-1 rounded-lg p-4">
+      {elections.map((election) => <div key={election.id} className="bg-primary-container rounded-lg p-4">
         <div className="space-y-3 flex flex-col h-full">
 
           <ElectionStatus election={election} />
@@ -150,14 +150,14 @@ const ElectionList: React.FC<{ elections: Election[] }> = ({ elections }) => {
 const ElectionStatus: React.FC<{ election: Election }> = ({ election }) => {
   return (
     <div>
-      <h2 className="text-lg font-bold">{election.name}</h2>
+      <h2 className="text-lg font-bold underline">{election.name}</h2>
       <div>
         <span className="text-base font-bold">Status: </span>
         <span className="text-base">{election.isOpen ? "Open" : "Closed"}</span>
       </div>
 
       <div>
-        <h4 className="font-bold">Candidates</h4>
+        <h4 className="font-bold">Candidates:</h4>
         <ul className="my-1">
           {election.candidates.map((candidate) => (
             <li key={candidate.id} className="text-sm">

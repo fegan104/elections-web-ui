@@ -171,6 +171,7 @@ export function useGetElection(): { election: Election | null; loading: boolean;
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError(err.message);
+          console.error(err)
         }
       } finally {
         setLoading(false);
@@ -183,7 +184,7 @@ export function useGetElection(): { election: Election | null; loading: boolean;
   return { election, loading, error };
 }
 
-export function useGetElectionWinners(): {
+export function useGetElectionWinners(numWinners: number): {
   response: ElectionWinnersResponse | null;
   closeElection: (numWinners: number) => void;
   loading: boolean;
@@ -217,12 +218,13 @@ export function useGetElectionWinners(): {
         if (electionId === null) {
           setError("No electionId");
         } else {
-          const response = await fetch(`${BASE_URL}elections/results?electionId=${electionId}&numWinners=1`)
+          console.log(`finding reults for ${numWinners}`)
+          const response = await fetch(`${BASE_URL}elections/results?electionId=${electionId}&numWinners=${numWinners}`)
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           } else {
-            const jsonData = await response.json();
+            const jsonData: ElectionWinnersResponse = await response.json();
             console.log(`Response: ${response.status} ${JSON.stringify(jsonData)}`)
             setError(null)
             setResponse(jsonData);
@@ -238,7 +240,7 @@ export function useGetElectionWinners(): {
     };
 
     fetchData();
-  }, [electionId]);
+  }, [electionId, numWinners]);
 
   return { response, closeElection, loading, error };
 }

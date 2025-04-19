@@ -26,7 +26,7 @@ export default function CreateAccount() {
   const handleSignUp = async () => {
     try {
       if (password != verifiedPassword) {
-        setError("Oops! The passwords don't match");
+        setError("Those passwords don't match");
         return
       }
       const response = await createUser({ email, password })

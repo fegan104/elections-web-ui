@@ -38,7 +38,7 @@ export default function SignIn() {
 
           <NameList names={getCandidates} onChanged={setCandidates} />
 
-          <TonalButton type="submit" className="w-full">Save</TonalButton>
+          <TonalButton type="submit" className="w-full" disabled={(getElectionName == "") || (getCandidates.length < 1)}>Save</TonalButton>
         </form>
       </Card>
     </div>

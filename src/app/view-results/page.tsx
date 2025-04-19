@@ -1,6 +1,7 @@
 "use client"
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
+import { TextInput } from "@/components/TextInput";
 import { useGetElectionWinners } from "@/data/electionsClient";
 import { ElectionWinnersResponse } from "@/data/model/models";
 import { CircularProgress } from "@mui/material";
@@ -16,7 +17,8 @@ export default function ViewResults() {
 }
 
 function ViewResultsScreen() {
-  const { response, closeElection, loading, error } = useGetElectionWinners()
+  const [numWinners, setNumWinners] = useState(1)
+  const { response, closeElection, loading, error } = useGetElectionWinners(numWinners)
 
   const handleCloseElection = async () => {
     closeElection(1)
@@ -25,8 +27,14 @@ function ViewResultsScreen() {
   return (
     <div>
       {loading ? <CircularProgress /> : <></>}
-      {response != null ? <ElectionResults data={response} onCloseElection={handleCloseElection} /> : <></>}
       {error ? (<h3> {error} </h3>) : <></>}
+      {response != null ? (
+        <ElectionResults
+          data={response}
+          onCloseElection={handleCloseElection}
+          numWinners={numWinners}
+          onUpdateNumWinners={setNumWinners} />
+      ) : <></>}
     </div>
   )
 }
@@ -34,11 +42,14 @@ function ViewResultsScreen() {
 interface ElectionResultsProps {
   data: ElectionWinnersResponse;
   onCloseElection: () => void;
+  numWinners: number;
+  onUpdateNumWinners: (winners: number) => void;
 }
 
-const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection }) => {
+const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection, numWinners, onUpdateNumWinners }) => {
   const dialogRef = useRef<ShareDialogRef>(null);
   const { election, voters, winners } = data
+  const [rawNumWinners, setRawNumWinners] = useState(numWinners.toString())
 
 
   const onShareVotingLink = () => {
@@ -78,18 +89,37 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
             </ul>
           </div>
 
+          {/* Section for closed election with winners */}
           <div className={`${winners == null ? "hidden" : ""}`}>
             <h4 className="font-bold">Winners</h4>
             <ul>
               <div className="text-sm">Ballots Exhausted {winners?.exhausted}</div>
               {winners?.winners.map((winner) => (
                 <li key={winner.candidate.id} className="text-sm">
-                  -{`${winner.candidate.name}  ${winner.votes} votes`}
+                  -{`${winner.candidate.name}  ${new Intl.NumberFormat("en-US").format(winner.votes)} votes`}
                 </li>
               ))}
             </ul>
+
+            <div className="mt-2 space-y-2">
+            <h2 className="text-lg font-bold">Details</h2>
+              <p className="text-sm">{`These are the results for the top ${numWinners} candidates. Would you like to find the results for another number of winners?`}</p>
+              <TextInput label="Alternative Number of Winners" type="number" value={rawNumWinners} onChange={(entry) => {
+                setRawNumWinners(entry)
+              }}
+              />
+              <TonalButton className="w-full" disabled={isNaN(parseInt(rawNumWinners))} onClick={() => {
+                if (!isNaN(parseInt(rawNumWinners))) {
+                  onUpdateNumWinners(parseInt(rawNumWinners))
+                }
+              }}>
+                Re-run results
+              </TonalButton>
+            </div>
+
           </div>
 
+          {/* Section for open election with ongoing voting. */}
           <div className={`${winners != null ? "hidden" : ""} space-y-2 flex flex-col text-sm`}>
             <p>This eleciton is still open for voting. In order to begin counting the votes you must first close the election.</p>
             <TonalButton onClick={onShareVotingLink}>
@@ -98,7 +128,6 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
             <TonalButton onClick={onCloseElection}>
               Close election
             </TonalButton>
-
           </div>
         </div>
       </Card>
