@@ -24,7 +24,6 @@ import { sendVote, useGetElection } from "@/data/electionsClient";
 import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
-import { ErrorMessage } from "@/components/ErrorMessage";
 
 function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
   return (
