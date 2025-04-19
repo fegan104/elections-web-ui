@@ -168,14 +168,7 @@ const ElectionStatus: React.FC<{ election: Election }> = ({ election }) => {
       </div>
 
       <div>
-        <h4 className="font-bold">Voters: {election.voters.length} total vote(s)</h4>
-        <ul className="gap-4">
-          {election.voters.map((voterName) => (
-            <li key={voterName} className="text-sm">
-              -{voterName === "" ? `Anonymous` : voterName}
-            </li>
-          ))}
-        </ul>
+        <h4 className="font-bold">Voters: {election.voters.length} total votes</h4>
       </div>
     </div>
   )
