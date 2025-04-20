@@ -3,6 +3,7 @@ import { TextButton, TonalButton } from "@/components/Buttons"
 import { Card } from "@/components/Card"
 import { TextInput } from "@/components/TextInput"
 import { createNewElection } from "@/data/electionsClient"
+import { analyticsEvents } from "@/data/firebaseClient"
 import { useRouter } from "next/navigation"
 import { KeyboardEvent, useState } from "react"
 
@@ -18,7 +19,8 @@ export default function SignIn() {
     }
     const response = await createNewElection(request)
     if (response.ok) {
-      router.replace("/view-elections")
+      analyticsEvents.trackCreateElection()
+      router.replace("/")
     }
   }
 
@@ -38,7 +40,9 @@ export default function SignIn() {
 
           <NameList names={getCandidates} onChanged={setCandidates} />
 
-          <TonalButton type="submit" className="w-full" disabled={(getElectionName == "") || (getCandidates.length < 1)}>Save</TonalButton>
+          <TonalButton type="submit" className="w-full" disabled={(getElectionName == "") || (getCandidates.length < 1)}>
+            Save
+          </TonalButton>
         </form>
       </Card>
     </div>

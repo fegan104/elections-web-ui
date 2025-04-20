@@ -7,6 +7,7 @@ import { TextInput } from "@/components/TextInput";
 import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { analyticsEvents } from "@/data/firebaseClient";
 
 export default function CreateAccount() {
   const { user } = useFirebaseUser()
@@ -32,6 +33,8 @@ export default function CreateAccount() {
       const response = await createUser({ email, password })
       if (!response.ok) {
         throw Error(`Network error HTTP code=${response.status}}`)
+      } else {
+        analyticsEvents.trackSignUp()
       }
     } catch (err: unknown) {
       if (err instanceof Error) {

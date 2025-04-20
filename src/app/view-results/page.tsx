@@ -3,6 +3,7 @@ import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { TextInput } from "@/components/TextInput";
 import { useGetElectionWinners } from "@/data/electionsClient";
+import { analyticsEvents } from "@/data/firebaseClient";
 import { ElectionWinnersResponse } from "@/data/model/models";
 import { CircularProgress } from "@mui/material";
 import { forwardRef, Ref, Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -176,6 +177,7 @@ const ShareDialog = forwardRef(function AppDialog(
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(textToCopy);
+      analyticsEvents.trackShare()
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -194,7 +196,7 @@ const ShareDialog = forwardRef(function AppDialog(
       </div>
       <div className="flex justify-end space-x-2">
         <TextButton className="ring-1" onClick={() => dialogRef.current?.close()}>
-          Close
+          Cancel
         </TextButton>
         <TonalButton onClick={handleCopy}>
           {copied ? "Copied!" : "Copy"}

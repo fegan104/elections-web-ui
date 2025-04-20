@@ -245,7 +245,6 @@ export function useGetElectionWinners(numWinners: number): {
   return { response, closeElection, loading, error };
 }
 
-
 async function sendCloseElection(electionId: ElectionId, numWinners: number): Promise<ElectionWinnersResponse | Error> {
   await auth.authStateReady()
   const idToken = await auth.currentUser?.getIdToken()

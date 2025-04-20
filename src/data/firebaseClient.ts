@@ -1,11 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { getAnalytics, logEvent, isSupported } from "firebase/analytics";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAjc6i6pxqMWTESadK-_Vx987eqsWvxFhA",
   authDomain: "scottish-stv.firebaseapp.com",
@@ -19,5 +16,35 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const analytics = await isSupported().then(yes => yes ? getAnalytics(app) : null)
 
-export { app, auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut };
+type AnalyticsEvents = {
+  trackSignIn: () => void;
+  trackSignUp: () => void;
+  trackVote: () => void;
+  trackShare: () => void;
+  trackCreateElection: () => void;
+}
+
+const safeLogEvent = (eventName: string) => {
+  if (analytics != null) {
+      logEvent(analytics, eventName)
+  }
+}
+
+const analyticsEvents: AnalyticsEvents = {
+  trackSignIn: () => safeLogEvent("sign_in"),
+  trackSignUp: () => safeLogEvent("sign_up"),
+  trackVote: () => safeLogEvent("vote"),
+  trackShare: () => safeLogEvent("share"),
+  trackCreateElection: () => safeLogEvent("create_election")
+}
+
+export { 
+  app, 
+  auth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  analyticsEvents,
+};

@@ -24,6 +24,7 @@ import { sendVote, useGetElection } from "@/data/electionsClient";
 import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
+import { analyticsEvents } from "@/data/firebaseClient";
 
 function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
   return (
@@ -108,6 +109,9 @@ function VoteScreen() {
     }
     const response = await sendVote(electionId, items)
     setSubmissionState(response.ok)
+    if (response.ok) {
+      analyticsEvents.trackVote()
+    }
   }
 
   if (submissionState === true) {

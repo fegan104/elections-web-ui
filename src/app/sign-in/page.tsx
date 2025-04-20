@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from "react";
-import { auth, signInWithEmailAndPassword } from "../../data/firebaseClient";
+import { auth, signInWithEmailAndPassword, analyticsEvents } from "../../data/firebaseClient";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { useRouter } from "next/navigation";
 import { TextInput } from "@/components/TextInput";
@@ -24,9 +24,10 @@ export default function SignIn() {
 
   const handleSignIn = async () => {
     try {
-      console.log("Attempting sign in");
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("User signed up:", userCredential.user);
+      if (userCredential != null) {
+        analyticsEvents.trackSignIn()
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
