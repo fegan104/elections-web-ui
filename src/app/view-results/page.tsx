@@ -2,7 +2,7 @@
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { TextInput } from "@/components/TextInput";
-import { useGetElectionWinners } from "@/data/electionsClient";
+import { useGetElectionWinners, useShareableVotingUrl } from "@/data/electionsClient";
 import { analyticsEvents } from "@/data/firebaseClient";
 import { ElectionWinnersResponse } from "@/data/model/models";
 import { CircularProgress } from "@mui/material";
@@ -51,6 +51,7 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
   const dialogRef = useRef<ShareDialogRef>(null);
   const { election, voters, winners } = data
   const [rawNumWinners, setRawNumWinners] = useState(numWinners.toString())
+  const shareableVotingUrl = useShareableVotingUrl(election)
 
 
   const onShareVotingLink = () => {
@@ -133,7 +134,7 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
         </div>
       </Card>
 
-      <ShareDialog textToCopy={`https://elections.frankegan.com/vote?electionId=${election.id}`} ref={dialogRef} />
+      <ShareDialog textToCopy={shareableVotingUrl} ref={dialogRef} />
     </div>
   );
 };

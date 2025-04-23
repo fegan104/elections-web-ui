@@ -65,7 +65,7 @@ function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, on
 }
 
 function VoteScreen() {
-  const { election, loading, error } = useGetElection()
+  const electionResultState = useGetElection()
   const { status, user } = useFirebaseUser()
   const [items, setItems] = useState<ElectionCandidate[]>([]);
   const [submissionState, setSubmissionState] = useState<boolean | null>(null)
@@ -103,7 +103,10 @@ function VoteScreen() {
   }
 
   const castVote = async () => {
-    const electionId = election?.id
+    if (electionResultState.state != "success") {
+      return
+    }
+    const electionId = electionResultState.election.id
     if (electionId === undefined) {
       return
     }
@@ -120,13 +123,21 @@ function VoteScreen() {
         <h3>Your ballot was submitted successfully ✅</h3>
       </div>
     )
-  } else if (error !== null) {
+  }
+
+  if (electionResultState.state == "loading") {
+    return (<CircularProgress />)
+  }
+
+  if (electionResultState.state == "error") {
     return (
       <div>
         <h3 className="flex justify-center">Hmmn we can&apos;t find that election 🤔</h3>
       </div>
     )
-  } else if (election !== null) {
+  }
+
+  if (electionResultState.state == "success") {
     return (
       <div className="space-y-2">
         <div className="flex justify-center">
@@ -135,14 +146,13 @@ function VoteScreen() {
               <Card className="h-full flex-col space-y-2 w-full">
                 <h4>Available Candidates</h4>
                 <ul className="space-y-2 p-4 border rounded-lg w-full">
-                  {[...election.candidates].map(item => (
+                  {[...electionResultState.election.candidates].map(item => (
                     <li className={`px-2 py-1 ${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`} onClick={() => onAddCandidateToRankingList(item)} key={item.id}>{item.name}</li>
                   ))}
                 </ul>
               </Card>
             </div>
 
-            {(loading === true) ? <CircularProgress /> : <></>}
 
             <div className="flex flex-col items-center w-[256px]">
 

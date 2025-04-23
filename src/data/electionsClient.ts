@@ -143,45 +143,53 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
   return { data, loading, error };
 }
 
-export function useGetElection(): { election: Election | null; loading: boolean; error: string | null } {
-  const { electionId } = useQueryElectionId()
-  const [election, setElection] = useState<Election | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+type ElectionLoadingState = {
+  state: 'loading'
+}
+
+type ElectionSuccessState = {
+  state: 'success',
+  election: Election
+}
+
+type ElectionFailureState = {
+  state: 'error',
+  error: string
+}
+
+type ElectionResultState = ElectionLoadingState | ElectionSuccessState | ElectionFailureState
+
+export function useGetElection(): ElectionResultState {
+  const queryParam = useQueryElectionId()
+  const [state, setState] = useState<ElectionResultState>({ state: 'loading' })
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      setError(null);
       try {
-        if (electionId === null) {
-          setError("No electionId");
-        } else {
-          const response = await fetch(`${BASE_URL}elections/${electionId}`)
+        if (!queryParam.isLoading && queryParam.electionId === null) {
+          setState({ state: 'error', error: "No electionId" });
+        } else if (queryParam.electionId !== null) {
+          const response = await fetch(`${BASE_URL}elections/${queryParam.electionId}`)
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           } else {
-            const jsonData = await response.json();
-            console.log(`Response: ${response.status} ${JSON.stringify(jsonData)}`)
-            setError(null)
-            setElection(jsonData);
+            const jsonData: Election = await response.json();
+            setState({ state: 'success', election: jsonData });
           }
         }
       } catch (err: unknown) {
+        console.error(err)
         if (err instanceof Error) {
-          setError(err.message);
-          console.error(err)
+          setState({ state: "error", error: err.message })
         }
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchData();
-  }, [electionId]);
+  }, [queryParam]);
 
-  return { election, loading, error };
+  return state;
 }
 
 export function useGetElectionWinners(numWinners: number): {
@@ -264,4 +272,16 @@ async function sendCloseElection(electionId: ElectionId, numWinners: number): Pr
 
   const winners = await response.json()
   return winners
+}
+
+export function useShareableVotingUrl(election: Election) {
+  const [domain, setDomain] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setDomain(window.location.origin);
+    }
+  }, []);
+
+  return `${domain}/vote?electionId=${election.id}`
 }
