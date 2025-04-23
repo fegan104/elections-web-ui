@@ -7,6 +7,15 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/v1/**",
+        "run": {
+          "serviceId": "scottish-stv-api",
+          "region": "us-central1"
+        }
+      }
     ]
   }
 }
