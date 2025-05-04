@@ -21,16 +21,25 @@ export interface ElectionUser {
   name: string;
 }
 
-export interface Winner {
+export interface CandidateResult {
   candidate: ElectionCandidate;
   votes: number;
+}
+
+export interface VoteCountingRound {
+  roundNumber: number;
+  quota: number;
+  winners: CandidateResult[];
+  candidates: CandidateResult[];
+}
+
+export interface VoteCountingResponse {
+  winners: CandidateResult[];
+  exhausted: number;
 }
 
 export interface ElectionWinnersResponse {
   election: Election
   voters: ElectionUser[],
-  winners: {
-    winners: Winner[];
-    exhausted: number;
-  }| null
+  voteCountingResponse: VoteCountingResponse | null
 }

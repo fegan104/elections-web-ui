@@ -49,7 +49,7 @@ interface ElectionResultsProps {
 
 const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection, numWinners, onUpdateNumWinners }) => {
   const dialogRef = useRef<ShareDialogRef>(null);
-  const { election, voters, winners } = data
+  const { election, voters, voteCountingResponse } = data
   const [rawNumWinners, setRawNumWinners] = useState(numWinners.toString())
   const shareableVotingUrl = useShareableVotingUrl(election)
 
@@ -92,11 +92,11 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
           </div>
 
           {/* Section for closed election with winners */}
-          <div className={`${winners == null ? "hidden" : ""}`}>
+          <div className={`${voteCountingResponse == null ? "hidden" : ""}`}>
             <h4 className="font-bold">Winners</h4>
             <ul>
-              <div className="text-sm">Ballots Exhausted {winners?.exhausted}</div>
-              {winners?.winners.map((winner) => (
+              <div className="text-sm">Ballots Exhausted {voteCountingResponse?.exhausted}</div>
+              {voteCountingResponse?.winners.map((winner) => (
                 <li key={winner.candidate.id} className="text-sm">
                   -{`${winner.candidate.name}  ${new Intl.NumberFormat("en-US").format(winner.votes)} votes`}
                 </li>
@@ -122,7 +122,7 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
           </div>
 
           {/* Section for open election with ongoing voting. */}
-          <div className={`${winners != null ? "hidden" : ""} space-y-2 flex flex-col text-sm`}>
+          <div className={`${voteCountingResponse != null ? "hidden" : ""} space-y-2 flex flex-col text-sm`}>
             <p>This eleciton is still open for voting. In order to begin counting the votes you must first close the election.</p>
             <TonalButton onClick={onShareVotingLink}>
               Share voting link
