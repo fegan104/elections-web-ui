@@ -11,15 +11,11 @@ import Link from "next/link";
 export default function Home() {
   const { status } = useFirebaseUser()
 
-  if (status == 'loading') {
-    return <CircularProgress />
+  if (status == "authenticated") {
+    return <ViewElections />;
   }
 
-  if (status == "unauthenticated") {
-    return <LandingPage />
-  }
-
-  return <ViewElections />;
+  return <LandingPage />
 }
 
 const LandingPage = () => {

@@ -101,7 +101,7 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
   const [data, setData] = useState<Election[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useFirebaseUser()
+  const { status, user } = useFirebaseUser()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -110,9 +110,10 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
       try {
         const idToken = await user?.getIdToken()
 
-        if (idToken === undefined) {
+        if (status !== "loading" && idToken === undefined) {
+          console.error("You must be signed in to complete that action.")
           setError("You must be signed in to complete that action.");
-        } else {
+        } else if (status !== "loading") {
           const headers = {
             Authorization: `Bearer ${idToken}`,
           };
@@ -130,6 +131,7 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
+          console.error(err)
           setError(err?.message);
         }
       } finally {
@@ -138,7 +140,7 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
     };
 
     fetchData();
-  }, [user]);
+  }, [status, user]);
 
   return { data, loading, error };
 }
