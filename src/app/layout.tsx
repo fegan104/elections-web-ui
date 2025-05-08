@@ -2,10 +2,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import useFirebaseUser from "@/data/useFirebaseUser";
-import { Avatar } from "@mui/material";
 import { auth, signOut } from "@/data/firebaseClient"
 import { TextButton, TonalButton } from "@/components/Buttons";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, UserCircle } from "lucide-react";
 import Link from "next/link";
 
 const geistSans = Geist({
@@ -27,9 +26,13 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <head>
         <title>cascade-elections</title>
-        <meta name="description" content="A single tranferable vote elections web app." />
+        <meta name="description" content="Fair, proportional elections made simple with ranked-choice voting." />
         <meta name="author" content="Frank Egan" />
         <meta name="theme-color" content="#3b82f6" />
+
+        <meta property="og:title" content="cascade-elections." />
+        <meta property="og:description" content="Fair, proportional elections made simple with ranked-choice voting." />
+        <meta property="og:image" content="og_image.png" />
 
       </head>
       <body className={`
@@ -86,7 +89,10 @@ const TopAppBar = () => {
             Sign Out
           </TonalButton>
           <a href="/profile">
-            <Avatar alt={user.displayName ?? undefined} src={user.photoURL ?? undefined} className="ring-1"/>
+            {user.photoURL ?
+              (<img src={user.photoURL} alt={user.displayName ?? undefined} className="ring-1 size-10 rounded-full" />) :
+              (<UserCircle aria-label={user.displayName ?? undefined} className="size-10 rounded-full" />)
+            }
           </a>
         </>
       ) : (

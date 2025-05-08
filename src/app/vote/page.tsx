@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from "@/components/CircularProgress";
 import { ElectionCandidate } from "@/data/model/models";
 import { sendVote, useGetElection } from "@/data/electionsClient";
 import { TonalButton } from "@/components/Buttons";

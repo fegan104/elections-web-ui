@@ -1,6 +1,6 @@
 'use client'
 import { useGetCurrentUsersElections } from "@/data/electionsClient"
-import { CircularProgress } from "@mui/material";
+import CircularProgress from "@/components/CircularProgress";
 import { Election } from "@/data/model/models"
 import FloatingActionButton, { TextButton, TonalButton } from "@/components/Buttons";
 import { ErrorMessage } from "@/components/ErrorMessage";

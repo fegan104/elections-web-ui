@@ -5,7 +5,7 @@ import { TextInput } from "@/components/TextInput";
 import { useGetElectionWinners, useShareableVotingUrl } from "@/data/electionsClient";
 import { analyticsEvents } from "@/data/firebaseClient";
 import { ElectionWinnersResponse, VoteCountingRound } from "@/data/model/models";
-import { CircularProgress } from "@mui/material";
+import CircularProgress from "@/components/CircularProgress";
 import { forwardRef, Ref, Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 export default function ViewResults() {
@@ -59,7 +59,7 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
   }
 
   return (
-    <div className="flex items-center justify-center w-full">
+    <div className="flex flex-col items-center justify-center w-full space-y-4">
       <Card className="w-fit max-w-[512px]">
         <div className="p-3 space-y-2 w-fit">
           <h2 className="text-lg font-bold">Results for {election.name}</h2>
@@ -135,9 +135,12 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
       </Card>
 
       {(data.voteCountingResponse?.rounds ? (
-        <Card>
-          <VotingRoundsViewer rounds={data.voteCountingResponse.rounds} />
-        </Card>
+        <div>
+          <h1 className="text-lg font-bold">Results</h1>
+          <Card className="w-[512px]">
+            <VotingRoundsViewer rounds={data.voteCountingResponse.rounds} />
+          </Card>
+        </div>
       ) : <></>)}
 
 
@@ -231,10 +234,13 @@ const VotingRoundsViewer: React.FC<{ rounds: VoteCountingRound[] }> = ({ rounds 
   };
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h2 className="text-xl font-bold mb-2">
-        Round {currentRound.roundNumber} — Action: {currentRound.action}
+    <div className="p-3 w-full mx-auto flex flex-col items-start">
+      <h2 className="text-xl font-bold">
+        Round {currentRound.roundNumber}
       </h2>
+      <h3 className="mb-2">
+        Action: {currentRound.action}
+      </h3>
       <p className="mb-2">Quota: {currentRound.quota}</p>
 
       <div className="mb-4">
@@ -261,21 +267,20 @@ const VotingRoundsViewer: React.FC<{ rounds: VoteCountingRound[] }> = ({ rounds 
 
       <p className="mb-4">Exhausted votes: {currentRound.exhausted}</p>
 
-      <div className="flex justify-between">
-        <button
+      <div className="flex justify-between w-full">
+        <TonalButton
           onClick={goPrev}
           disabled={currentRoundIndex === 0}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         >
           Previous
-        </button>
-        <button
+        </TonalButton>
+
+        <TonalButton
           onClick={goNext}
           disabled={currentRoundIndex === rounds.length - 1}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         >
           Next
-        </button>
+        </TonalButton>
       </div>
     </div>
   );

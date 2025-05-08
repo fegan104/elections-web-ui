@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { updateProfile, updateEmail, updatePassword } from "firebase/auth";
 import useFirebaseUser from "@/data/useFirebaseUser";
-import { CircularProgress } from "@mui/material";
+import CircularProgress from "@/components/CircularProgress";
 import { Card } from "@/components/Card";
 import { TextInput } from "@/components/TextInput";
 import { TonalButton } from "@/components/Buttons";
