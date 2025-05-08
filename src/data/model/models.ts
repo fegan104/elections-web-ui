@@ -29,6 +29,8 @@ export interface CandidateResult {
 export interface VoteCountingRound {
   roundNumber: number;
   quota: number;
+  action: string;
+  exhausted: number;
   winners: CandidateResult[];
   candidates: CandidateResult[];
 }
@@ -36,6 +38,7 @@ export interface VoteCountingRound {
 export interface VoteCountingResponse {
   winners: CandidateResult[];
   exhausted: number;
+  rounds: VoteCountingRound[];
 }
 
 export interface ElectionWinnersResponse {

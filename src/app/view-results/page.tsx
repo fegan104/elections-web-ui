@@ -4,7 +4,7 @@ import { Card } from "@/components/Card";
 import { TextInput } from "@/components/TextInput";
 import { useGetElectionWinners, useShareableVotingUrl } from "@/data/electionsClient";
 import { analyticsEvents } from "@/data/firebaseClient";
-import { ElectionWinnersResponse } from "@/data/model/models";
+import { ElectionWinnersResponse, VoteCountingRound } from "@/data/model/models";
 import { CircularProgress } from "@mui/material";
 import { forwardRef, Ref, Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
 
@@ -104,7 +104,7 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
             </ul>
 
             <div className="mt-2 space-y-2">
-            <h2 className="text-lg font-bold">Details</h2>
+              <h2 className="text-lg font-bold">Details</h2>
               <p className="text-sm">{`These are the results for the top ${numWinners} candidates. Would you like to find the results for another number of winners?`}</p>
               <TextInput label="Alternative Number of Winners" type="number" value={rawNumWinners} onChange={(entry) => {
                 setRawNumWinners(entry)
@@ -133,6 +133,13 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
           </div>
         </div>
       </Card>
+
+      {(data.voteCountingResponse?.rounds ? (
+        <Card>
+          <VotingRoundsViewer rounds={data.voteCountingResponse.rounds} />
+        </Card>
+      ) : <></>)}
+
 
       <ShareDialog textToCopy={shareableVotingUrl} ref={dialogRef} />
     </div>
@@ -206,3 +213,71 @@ const ShareDialog = forwardRef(function AppDialog(
     </dialog>
   );
 });
+
+const VotingRoundsViewer: React.FC<{ rounds: VoteCountingRound[] }> = ({ rounds }) => {
+  const [currentRoundIndex, setCurrentRoundIndex] = useState<number>(0);
+  const currentRound = rounds[currentRoundIndex];
+
+  const goPrev = () => {
+    if (currentRoundIndex > 0) {
+      setCurrentRoundIndex(currentRoundIndex - 1);
+    }
+  };
+
+  const goNext = () => {
+    if (currentRoundIndex < rounds.length - 1) {
+      setCurrentRoundIndex(currentRoundIndex + 1);
+    }
+  };
+
+  return (
+    <div className="p-4 max-w-xl mx-auto">
+      <h2 className="text-xl font-bold mb-2">
+        Round {currentRound.roundNumber} — Action: {currentRound.action}
+      </h2>
+      <p className="mb-2">Quota: {currentRound.quota}</p>
+
+      <div className="mb-4">
+        <h3 className="font-semibold">Winners:</h3>
+        <ul className="list-disc list-inside">
+          {currentRound.winners.map((winner) => (
+            <li key={winner.candidate.id}>
+              {winner.candidate.name} — {winner.votes} votes
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mb-4">
+        <h3 className="font-semibold">Candidates:</h3>
+        <ul className="list-disc list-inside">
+          {currentRound.candidates.map((c) => (
+            <li key={c.candidate.id}>
+              {c.candidate.name} — {c.votes} votes
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p className="mb-4">Exhausted votes: {currentRound.exhausted}</p>
+
+      <div className="flex justify-between">
+        <button
+          onClick={goPrev}
+          disabled={currentRoundIndex === 0}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <button
+          onClick={goNext}
+          disabled={currentRoundIndex === rounds.length - 1}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
