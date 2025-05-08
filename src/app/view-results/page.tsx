@@ -71,10 +71,10 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
 
           <div>
             <h4 className="font-bold">Candidates</h4>
-            <ul className="my-1">
+            <ul className="list-disc list-inside my-1">
               {election.candidates.map((candidate) => (
                 <li key={candidate.id} className="text-sm">
-                  -{candidate.name}
+                  {candidate.name}
                 </li>
               ))}
             </ul>
@@ -82,10 +82,10 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
 
           <div>
             <h4 className="font-bold">Voters: {voters.length} total vote(s)</h4>
-            <ul className="gap-4">
+            <ul className="list-disc list-inside gap-4">
               {voters.map((voter) => (
                 <li key={voter.id} className="text-sm">
-                  -{voter.name === "" ? `Anonymous (${voter.id})` : voter.name}
+                  {voter.name === "" ? `Anonymous (${voter.id})` : voter.name}
                 </li>
               ))}
             </ul>
@@ -93,15 +93,18 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
 
           {/* Section for closed election with winners */}
           <div className={`${voteCountingResponse == null ? "hidden" : ""}`}>
-            <h4 className="font-bold">Winners</h4>
-            <ul>
-              <div className="text-sm">Ballots Exhausted {voteCountingResponse?.exhausted}</div>
-              {voteCountingResponse?.winners.map((winner) => (
-                <li key={winner.candidate.id} className="text-sm">
-                  -{`${winner.candidate.name}  ${new Intl.NumberFormat("en-US").format(winner.votes)} votes`}
-                </li>
-              ))}
-            </ul>
+            <div className="mb-4">
+              <h3 className="font-semibold">Winners:</h3>
+              <ul className="list-disc list-inside">
+                {voteCountingResponse?.winners.map((winner) => (
+                  <li key={winner.candidate.id}>
+                    {winner.candidate.name} — {new Intl.NumberFormat("en-US").format(winner.votes)} votes
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <p className="mb-4">Exhausted votes: {voteCountingResponse?.exhausted}</p>
 
             <div className="mt-2 space-y-2">
               <h2 className="text-lg font-bold">Details</h2>
@@ -135,9 +138,9 @@ const ElectionResults: React.FC<ElectionResultsProps> = ({ data, onCloseElection
       </Card>
 
       {(data.voteCountingResponse?.rounds ? (
-        <div>
-          <h1 className="text-lg font-bold">Results</h1>
-          <Card className="w-[512px]">
+        <div className="w-full max-w-[512px]">
+          <h1 className="text-lg font-bold">Step-by-Step</h1>
+          <Card className="">
             <VotingRoundsViewer rounds={data.voteCountingResponse.rounds} />
           </Card>
         </div>
@@ -248,7 +251,7 @@ const VotingRoundsViewer: React.FC<{ rounds: VoteCountingRound[] }> = ({ rounds 
         <ul className="list-disc list-inside">
           {currentRound.winners.map((winner) => (
             <li key={winner.candidate.id}>
-              {winner.candidate.name} — {winner.votes} votes
+              {winner.candidate.name} — {new Intl.NumberFormat("en-US").format(winner.votes)} votes
             </li>
           ))}
         </ul>
@@ -259,7 +262,7 @@ const VotingRoundsViewer: React.FC<{ rounds: VoteCountingRound[] }> = ({ rounds 
         <ul className="list-disc list-inside">
           {currentRound.candidates.map((c) => (
             <li key={c.candidate.id}>
-              {c.candidate.name} — {c.votes} votes
+              {c.candidate.name} — {new Intl.NumberFormat("en-US").format(c.votes)} votes
             </li>
           ))}
         </ul>
