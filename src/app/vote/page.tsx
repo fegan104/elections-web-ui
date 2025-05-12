@@ -25,6 +25,7 @@ import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { analyticsEvents } from "@/data/firebaseClient";
+import Link from "next/link";
 
 function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
   return (
@@ -173,9 +174,9 @@ function VoteScreen() {
 
                 <div className={`${(status === 'unauthenticated') ? "" : "hidden"}`}>
                   <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
-                  <a href="/sign-up">
+                  <Link passHref href="/sign-up">
                     <TonalButton className="w-full">Create an Account</TonalButton>
-                  </a>
+                  </Link>
                 </div>
 
                 <TonalButton className={`w-full ${(status === 'authenticated') ? "" : "hidden"}`} onClick={castVote} disabled={(user == null) || (items.length == 0)}>

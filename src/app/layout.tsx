@@ -88,21 +88,21 @@ const TopAppBar = () => {
           <TonalButton onClick={handleSignOut}>
             Sign Out
           </TonalButton>
-          <a href="/profile">
+          <Link href="/profile">
             {user.photoURL ?
               (<img src={user.photoURL} alt={user.displayName ?? undefined} className="ring-1 size-10 rounded-full" />) :
               (<UserCircle aria-label={user.displayName ?? undefined} className="size-10 rounded-full" />)
             }
-          </a>
+          </Link>
         </>
       ) : (
         <>
-          <a href="/sign-in">
+          <Link href="/sign-in">
             <TextButton>Sign In</TextButton>
-          </a>
-          <a href="/sign-up">
+          </Link>
+          <Link href="/sign-up">
             <TextButton>Sign Up</TextButton>
-          </a>
+          </Link>
         </>
       )}
     </div>
@@ -113,9 +113,9 @@ const SideBar = () => {
 
   return (
     <div className="p-4 justify-items-center">
-      <a href="/create-election">
+      <Link href="/create-election">
         <TonalButton><PlusCircle size={24} className="pe-1" /> Create an Election</TonalButton>
-      </a>
+      </Link>
 
       <div className="pt-4 justify-center">
         <Link href="/">

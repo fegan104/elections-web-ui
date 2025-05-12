@@ -76,7 +76,7 @@ const AboutPage = () => {
           Our app uses fractional vote transfers when redistributing surplus votes. In the case of a tie, we follow a consistent rule based on earliest rounds of elimination or a random tie-break if needed.
         </p>
         <p>
-          You can read the full details in our <a href="https://github.com/fegan104/elections-api">source code documentation</a>.
+          You can read the full details in our <a target="blank" href="https://github.com/fegan104/elections-api">source code documentation</a>.
         </p>
       </section>
 

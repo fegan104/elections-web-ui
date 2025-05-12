@@ -6,6 +6,7 @@ import FloatingActionButton, { TextButton, TonalButton } from "@/components/Butt
 import { ErrorMessage } from "@/components/ErrorMessage";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { CirclePlus } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   const { status } = useFirebaseUser()
@@ -79,13 +80,13 @@ const LandingPage = () => {
       </section>
 
       <div className="text-center pt-4 space-y-2">
-        <a href="/sign-up">
+        <Link href="/sign-up">
           <TonalButton className="w-full">Create an Account</TonalButton>
-        </a>
+        </Link>
         <p>or</p>
-        <a href="/about">
+        <Link href="/about">
           <TextButton className="w-full">Learn how STV works in detail</TextButton>
-        </a>
+        </Link>
       </div>
     </main>
   );
@@ -110,9 +111,9 @@ const ViewElections = () => {
         <ElectionList elections={data} />
 
         <div className="md:hidden">
-          <a href="/create-election">
+          <Link href="/create-election">
             <FloatingActionButton label={"Create"} icon={<CirclePlus className="size-6" />} />
-          </a>
+          </Link>
         </div>
       </main>
     )
@@ -131,13 +132,13 @@ const ElectionList: React.FC<{ elections: Election[] }> = ({ elections }) => {
 
             <div className="flex flex-wrap justify-end items-center gap-2">
 
-              <a href={`/vote?electionId=${election.id}`} className={`${!election.isOpen ? "hidden" : ""}`}>
+              <Link href={`/vote?electionId=${election.id}`} className={`${!election.isOpen ? "hidden" : ""}`}>
                 <TextButton className="ring-primary ring-1"> {"Vote"} </TextButton>
-              </a>
+              </Link>
 
-              <a href={`/view-results?electionId=${election.id}`}>
+              <Link href={`/view-results?electionId=${election.id}`}>
                 <TextButton className="ring-primary ring-1"> {"View Results"} </TextButton>
-              </a>
+              </Link>
             </div>
 
           </div>
