@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useState } from "react";
-import { auth, signInWithEmailAndPassword, analyticsEvents } from "../../data/firebaseClient";
+import { auth, signInWithEmailAndPassword, analyticsEvents, sendPasswordResetEmail } from "../../data/firebaseClient";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { useRouter } from "next/navigation";
 import { TextInput } from "@/components/TextInput";
-import { TonalButton } from "@/components/Buttons";
+import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
 
@@ -37,6 +37,10 @@ export default function SignIn() {
     }
   };
 
+  const resetPassword = async () => {
+    await sendPasswordResetEmail(auth, email)
+  };
+
   return (
     <div className="w-full flex justify-center">
       <Card className="space-y-4 md:w-[512px] sm:w-full">
@@ -44,7 +48,8 @@ export default function SignIn() {
         <form action={handleSignIn} className="space-y-4">
           <TextInput value={email} onChange={(e) => setEmail(e)} label="Email" />
           <TextInput type="password" value={password} onChange={(e) => setPassword(e)} label="Password" />
-          <div className="flex w-full justify-end">
+          <div className="flex w-full justify-end space-x-4">
+            <TextButton className="ring-1" disabled={email.length == 0} onClick={resetPassword}>Reset Password</TextButton>
             <TonalButton type="submit">Sign In</TonalButton>
           </div>
         </form>

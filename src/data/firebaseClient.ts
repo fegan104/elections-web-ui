@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics, logEvent, isSupported } from "firebase/analytics";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { getAnalytics, logEvent, isSupported, setUserId } from "firebase/analytics";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User, sendPasswordResetEmail } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAjc6i6pxqMWTESadK-_Vx987eqsWvxFhA",
@@ -24,6 +24,7 @@ type AnalyticsEvents = {
   trackVote: () => void;
   trackShare: () => void;
   trackCreateElection: () => void;
+  setUserId: (firebaseUser: User) => void;
 }
 
 const safeLogEvent = (eventName: string) => {
@@ -37,7 +38,10 @@ const analyticsEvents: AnalyticsEvents = {
   trackSignUp: () => safeLogEvent("sign_up"),
   trackVote: () => safeLogEvent("vote"),
   trackShare: () => safeLogEvent("share"),
-  trackCreateElection: () => safeLogEvent("create_election")
+  trackCreateElection: () => safeLogEvent("create_election"),
+  setUserId: (firebaseUser) => {
+    if (analytics != null) setUserId(analytics, firebaseUser.uid)
+  }
 }
 
 export { 
@@ -47,4 +51,5 @@ export {
   signInWithEmailAndPassword, 
   signOut, 
   analyticsEvents,
+  sendPasswordResetEmail,
 };

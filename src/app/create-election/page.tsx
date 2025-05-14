@@ -1,5 +1,6 @@
 "use client"
 import { TextButton, TonalButton } from "@/components/Buttons"
+import CandidateNameListItem from "@/components/CandidateNameListItem"
 import { Card } from "@/components/Card"
 import { TextInput } from "@/components/TextInput"
 import { createNewElection } from "@/data/electionsClient"
@@ -30,7 +31,6 @@ export default function SignIn() {
         <form action={submitForm} className="space-y-4">
 
           <TextInput
-            className=""
             type="text"
             label="Election Details"
             placeholder="Election Name"
@@ -57,7 +57,7 @@ const NameList: React.FC<{
 
   const handleAddItem = () => {
     if (name.trim() !== "") {
-      onChanged([...names, name])
+      onChanged([...new Set([...names, name])])
       setName("") // Clear input after adding
     }
   };
@@ -72,9 +72,9 @@ const NameList: React.FC<{
   return (
     <div className="flex flex-col w-full">
       <h6 className="text-sm font-medium text-gray-700">Candidates</h6>
-      <ul>
+      <ul className="list-disc list-inside">
         {names.map((item, index) => (
-          <li key={index}>-{item}</li>
+          <CandidateNameListItem key={index} candidateName={item} onClick={() => { onChanged(names.filter(n => (n != item))) }} />
         ))}
       </ul>
 

@@ -9,6 +9,8 @@ import {
   PointerSensor,
   KeyboardSensor,
   DragEndEvent,
+  SensorDescriptor,
+  SensorOptions,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -26,6 +28,8 @@ import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { analyticsEvents } from "@/data/firebaseClient";
 import Link from "next/link";
+import { User } from "firebase/auth";
+import CandidateNameListItem from "@/components/CandidateNameListItem";
 
 function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
   return (
@@ -144,48 +148,10 @@ function VoteScreen() {
         <div className="flex justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-fill md:w-fit">
             
-            <div className="w-[256px]">              
-              <Card className="flex-col space-y-2 w-full">
-                <h4>Available Candidates</h4>
-                <ul className="space-y-2 p-4 border rounded-lg w-full">
-                  {[...electionResultState.election.candidates].map(item => (
-                    <li className={`px-2 py-1 ${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`} onClick={() => onAddCandidateToRankingList(item)} key={item.id}>{item.name}</li>
-                  ))}
-                </ul>
-              </Card>
-            </div>
+            {CandidateNamesCard(electionResultState.election.candidates, items, onAddCandidateToRankingList)}
 
 
-            <div className="flex flex-col items-center w-[256px]">
-
-              <Card className="space-y-2 h-full w-full">
-                <h4>Your Ballot</h4>
-
-                <div className="p-4 border rounded-lg w-full">
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
-                    <SortableContext items={items} strategy={verticalListSortingStrategy}>
-                      {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank from the list of Available Candidates.</span> : <></>}
-                      <ul className="space-y-2">
-                        {items.map(c => (
-                          <SortableItem key={c.id} candidate={c} onClick={() => removeSelecteditem(c.id)} />
-                        ))}
-                      </ul>
-                    </SortableContext>
-                  </DndContext>
-                </div>
-
-                <div className={`${(status === 'unauthenticated') ? "" : "hidden"}`}>
-                  <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
-                  <Link passHref href="/sign-up">
-                    <TonalButton className="w-full">Create an Account</TonalButton>
-                  </Link>
-                </div>
-
-                <TonalButton className={`w-full ${(status === 'authenticated') ? "" : "hidden"}`} onClick={castVote} disabled={(user == null) || (items.length == 0)}>
-                  Cast Vote
-                </TonalButton>
-              </Card>
-            </div>
+            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user)}
           </div>
 
         </div>
@@ -195,6 +161,64 @@ function VoteScreen() {
       </div>
     )
   }
+}
+
+function BallotCard(
+  sensors: SensorDescriptor<SensorOptions>[], 
+  handleDragEnd: (event: DragEndEvent) => void, 
+  items: ElectionCandidate[], 
+  removeSelecteditem: (id: string) => void, 
+  status: string, 
+  castVote: () => Promise<void>, 
+  user: User | null,
+) {
+  return <div className="flex flex-col items-center w-[256px]">
+    <Card className="space-y-2 h-full w-full">
+      <h4>Your Ballot</h4>
+
+      <div className="p-4 border rounded-lg w-full">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+          <SortableContext items={items} strategy={verticalListSortingStrategy}>
+            {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank from the list of Available Candidates.</span> : <></>}
+            <ul className="space-y-2">
+              {items.map(c => (
+                <SortableItem key={c.id} candidate={c} onClick={() => removeSelecteditem(c.id)} />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
+      </div>
+
+      <div className={`${(status === 'unauthenticated') ? "" : "hidden"}`}>
+        <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
+        <Link passHref href="/sign-up">
+          <TonalButton className="w-full">Create an Account</TonalButton>
+        </Link>
+      </div>
+
+      <TonalButton className={`w-full ${(status === 'authenticated') ? "" : "hidden"}`} onClick={castVote} disabled={(user == null) || (items.length == 0)}>
+        Cast Vote
+      </TonalButton>
+    </Card>
+  </div>;
+}
+
+function CandidateNamesCard(candidates: ElectionCandidate[], items: ElectionCandidate[], onAddCandidateToRankingList: (item: ElectionCandidate) => void) {
+  return <div className="w-[256px]">
+    <Card className="flex-col space-y-2 w-full">
+      <h4>Available Candidates</h4>
+      <ul className="space-y-2 p-4 border rounded-lg w-full">
+        {candidates.map(item => (
+          <CandidateNameListItem
+            key={item.id}
+            className={`${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`} 
+            candidateName={item.name}
+            onClick={() => onAddCandidateToRankingList(item)}
+          />
+        ))}
+      </ul>
+    </Card>
+  </div>;
 }
 
 export default function Vote() {

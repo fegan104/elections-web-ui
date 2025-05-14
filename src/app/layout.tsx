@@ -26,6 +26,9 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <head>
         <title>cascade-elections</title>
+        <link rel="preconnect" href="https://apis.google.com"/>
+        <link rel="preconnect" href="https://firebase.googleapis.com"/>
+
         <meta name="description" content="Fair, proportional elections made simple with ranked-choice voting." />
         <meta name="author" content="Frank Egan" />
         <meta name="theme-color" content="#3b82f6" />
@@ -33,7 +36,6 @@ export default function RootLayout({
         <meta property="og:title" content="cascade-elections." />
         <meta property="og:description" content="Fair, proportional elections made simple with ranked-choice voting." />
         <meta property="og:image" content="og_image.png" />
-
       </head>
       <body className={`
           ${geistSans.variable} ${geistMono.variable} 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { auth } from "./firebaseClient";
+import { analyticsEvents, auth } from "./firebaseClient";
 import { User } from "firebase/auth";
 
 type AuthState =
@@ -17,6 +17,7 @@ const useFirebaseUser = (): AuthState => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
+        analyticsEvents.setUserId(user)
         setAuthState({ status: 'authenticated', user });
       } else {
         setAuthState({ status: 'unauthenticated', user: null });
