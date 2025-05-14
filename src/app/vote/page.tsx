@@ -143,8 +143,9 @@ function VoteScreen() {
       <div className="space-y-2">
         <div className="flex justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-fill md:w-fit">
-            <div className="w-[256px]">
-              <Card className="h-full flex-col space-y-2 w-full">
+            
+            <div className="w-[256px]">              
+              <Card className="flex-col space-y-2 w-full">
                 <h4>Available Candidates</h4>
                 <ul className="space-y-2 p-4 border rounded-lg w-full">
                   {[...electionResultState.election.candidates].map(item => (
@@ -160,17 +161,18 @@ function VoteScreen() {
               <Card className="space-y-2 h-full w-full">
                 <h4>Your Ballot</h4>
 
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
-                  <SortableContext items={items} strategy={verticalListSortingStrategy}>
-                    <ul className="space-y-2 p-4 border rounded-lg w-full">
+                <div className="p-4 border rounded-lg w-full">
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+                    <SortableContext items={items} strategy={verticalListSortingStrategy}>
                       {(items.length == 0) ? <span className="font-medium text-sm">Select the candidates you wish to rank from the list of Available Candidates.</span> : <></>}
-
-                      {items.map(c => (
-                        <SortableItem key={c.id} candidate={c} onClick={() => removeSelecteditem(c.id)} />
-                      ))}
-                    </ul>
-                  </SortableContext>
-                </DndContext>
+                      <ul className="space-y-2">
+                        {items.map(c => (
+                          <SortableItem key={c.id} candidate={c} onClick={() => removeSelecteditem(c.id)} />
+                        ))}
+                      </ul>
+                    </SortableContext>
+                  </DndContext>
+                </div>
 
                 <div className={`${(status === 'unauthenticated') ? "" : "hidden"}`}>
                   <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
