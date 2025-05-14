@@ -15,7 +15,14 @@ export default function Home() {
     return <ViewElections />;
   }
 
-  return <LandingPage />
+  return (
+    <div>
+      <CircularProgress className={`${status != "loading" ? "hidden" : ""}`} />
+      <LandingPage />
+
+      <FloatingCreateElectionButton />
+    </div>
+  )
 }
 
 const LandingPage = () => {
@@ -89,10 +96,22 @@ const LandingPage = () => {
 };
 
 const ViewElections = () => {
+  return (
+    <main className="pb-12">
+      <h1 className="text-lg px-4">Elections</h1>
+
+      <ViewElectionsContent />
+
+      <FloatingCreateElectionButton />
+    </main>
+  )
+}
+
+const ViewElectionsContent = () => {
   const { data, loading, error } = useGetCurrentUsersElections()
 
   if (loading) {
-    return (<CircularProgress />)
+    return <CircularProgress />
   } else if (error) {
     return (
       <ErrorMessage>
@@ -100,19 +119,7 @@ const ViewElections = () => {
       </ErrorMessage>
     )
   } else if (data) {
-    return (
-      <main className="pb-12">
-        <h1 className="text-lg px-4">Elections</h1>
-
-        <ElectionList elections={data} />
-
-        <div className="md:hidden">
-          <Link href="/create-election">
-            <FloatingActionButton label={"Create"} icon={<CirclePlus className="size-6" />} />
-          </Link>
-        </div>
-      </main>
-    )
+    return <ElectionList elections={data} />
   }
 }
 
@@ -169,4 +176,12 @@ const ElectionStatus: React.FC<{ election: Election }> = ({ election }) => {
       </div>
     </div>
   )
+}
+
+function FloatingCreateElectionButton() {
+  return <div className="md:hidden">
+    <Link href="/create-election">
+      <FloatingActionButton label={"Create"} icon={<CirclePlus className="size-6" />} />
+    </Link>
+  </div>;
 }

@@ -26,8 +26,8 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <head>
         <title>cascade-elections</title>
-        <link rel="preconnect" href="https://apis.google.com"/>
-        <link rel="preconnect" href="https://firebase.googleapis.com"/>
+        <link rel="preconnect" href="https://apis.google.com" />
+        <link rel="preconnect" href="https://firebase.googleapis.com" />
 
         <meta name="description" content="Fair, proportional elections made simple with ranked-choice voting." />
         <meta name="author" content="Frank Egan" />
@@ -84,7 +84,11 @@ const TopAppBar = () => {
 
   return (
     <div className="sticky w-full flex flex-row flex-shrink-0 align-middle justify-end px-4 pt-2 mt-2 items-center space-x-2">
-      <h4 className="flex-1 justify-start">cascade-elections</h4>
+      <h4 className="flex-1 justify-start">
+        <Link href="/">
+          cascade-elections
+        </Link>
+      </h4>
       {user ? (
         <>
           <TonalButton onClick={handleSignOut}>
