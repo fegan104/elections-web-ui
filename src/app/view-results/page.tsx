@@ -2,11 +2,13 @@
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { TextInput } from "@/components/TextInput";
-import { useGetElectionWinners, useShareableVotingUrl } from "@/data/electionsClient";
+import { useGetElectionWinners, useQueryNumWinners, useShareableVotingUrl } from "@/data/electionsClient";
 import { analyticsEvents } from "@/data/firebaseClient";
 import { ElectionWinnersResponse, VoteCountingRound } from "@/data/model/models";
 import CircularProgress from "@/components/CircularProgress";
 import { forwardRef, Ref, Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 export default function ViewResults() {
 
@@ -18,8 +20,9 @@ export default function ViewResults() {
 }
 
 function ViewResultsScreen() {
-  const [numWinners, setNumWinners] = useState(1)
-  const { response, closeElection, loading, error } = useGetElectionWinners(numWinners)
+  const router = useRouter();
+  const numWinnersQueryParam = useQueryNumWinners()
+  const { response, closeElection, loading, error } = useGetElectionWinners()
 
   const handleCloseElection = async () => {
     closeElection(1)
@@ -28,13 +31,15 @@ function ViewResultsScreen() {
   return (
     <div>
       {loading ? <CircularProgress /> : <></>}
-      {error ? (<h3> {error} </h3>) : <></>}
+      {error ? (<ErrorMessage> {error} </ErrorMessage>) : <></>}
       {response != null ? (
         <ElectionResults
           data={response}
           onCloseElection={handleCloseElection}
-          numWinners={numWinners}
-          onUpdateNumWinners={setNumWinners} />
+          numWinners={numWinnersQueryParam.data}
+          onUpdateNumWinners={(newValue) => {
+            router.replace(`/view-results?electionId=${response.election.id}&numWinners=${newValue}`)
+          }} />
       ) : <></>}
     </div>
   )

@@ -8,8 +8,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 ///////TYPES
 
-interface RouteElectionIdState {
-  electionId: ElectionId | null,
+interface QueryParamState<T> {
+  data: T,
   isLoading: boolean,
   failure: Error | null
 }
@@ -76,10 +76,10 @@ export async function sendVote(electionId: ElectionId, rankings: ElectionCandida
 
 //////HOOKS
 
-export function useQueryElectionId(): RouteElectionIdState {
+export function useQueryElectionId(): QueryParamState<ElectionId | null> {
   const queryParams = useSearchParams()
-  const [state, setState] = useState<RouteElectionIdState>({
-    electionId: null,
+  const [state, setState] = useState<QueryParamState<ElectionId | null>>({
+    data: null,
     isLoading: true,
     failure: null,
   })
@@ -87,9 +87,30 @@ export function useQueryElectionId(): RouteElectionIdState {
   useEffect(() => {
     const parsedId = queryParams.get("electionId")
     if (parsedId !== undefined && parsedId != null && parsedId.length > 1) {
-      setState({ electionId: parsedId, isLoading: false, failure: null });
+      setState({ data: parsedId, isLoading: false, failure: null });
     } else {
-      setState({ electionId: null, isLoading: false, failure: Error(`Invalid electionid: ${parsedId}`) });
+      setState({ data: null, isLoading: false, failure: Error(`Invalid electionid: ${parsedId}`) });
+    }
+  }, [queryParams]);
+
+  return state
+}
+
+export function useQueryNumWinners(): QueryParamState<number> {
+  const queryParams = useSearchParams()
+  const [state, setState] = useState<QueryParamState<number>>({
+    data: 1,
+    isLoading: true,
+    failure: null,
+  })
+
+  useEffect(() => {
+    const parsedNumWinners = queryParams.get("numWinners")
+    if (parsedNumWinners !== undefined && parsedNumWinners != null && !isNaN(parseInt(parsedNumWinners))) {
+      setState({ data: parseInt(parsedNumWinners), isLoading: false, failure: null });
+    } else {
+      console.log("numWinenrs query param could not be parsed falling back to 1")
+      setState({ data: 1, isLoading: false, failure: null });
     }
   }, [queryParams]);
 
@@ -130,8 +151,8 @@ export function useGetCurrentUsersElections(): { data: Election[]; loading: bool
           }
         }
       } catch (err: unknown) {
+        console.error(err)
         if (err instanceof Error) {
-          console.error(err)
           setError(err?.message);
         }
       } finally {
@@ -168,10 +189,10 @@ export function useGetElection(): ElectionResultState {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!queryParam.isLoading && queryParam.electionId === null) {
+        if (!queryParam.isLoading && queryParam.data === null) {
           setState({ state: 'error', error: "No electionId" });
-        } else if (queryParam.electionId !== null) {
-          const response = await fetch(`${BASE_URL}elections/${queryParam.electionId}`)
+        } else if (queryParam.data !== null) {
+          const response = await fetch(`${BASE_URL}elections/${queryParam.data}`)
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -194,13 +215,14 @@ export function useGetElection(): ElectionResultState {
   return state;
 }
 
-export function useGetElectionWinners(numWinners: number): {
+export function useGetElectionWinners(): {
   response: ElectionWinnersResponse | null;
   closeElection: (numWinners: number) => void;
   loading: boolean;
   error: string | null;
 } {
-  const { electionId } = useQueryElectionId()
+  const electionIdQueryParam = useQueryElectionId()
+  const numWinnersQueryParam = useQueryNumWinners()
   const [response, setResponse] = useState<ElectionWinnersResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -225,17 +247,17 @@ export function useGetElectionWinners(numWinners: number): {
       setLoading(true);
       setError(null);
       try {
+        const electionId = electionIdQueryParam.data
+        const numWinners = numWinnersQueryParam.data
         if (electionId === null) {
-          setError("No electionId");
+          setError("Hmm we can't find results for that election 🔎");
         } else {
-          console.log(`finding reults for ${numWinners}`)
           const response = await fetch(`${BASE_URL}elections/results?electionId=${electionId}&numWinners=${numWinners}`)
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           } else {
             const jsonData: ElectionWinnersResponse = await response.json();
-            console.log(`Response: ${response.status} ${JSON.stringify(jsonData)}`)
             setError(null)
             setResponse(jsonData);
           }
@@ -250,7 +272,7 @@ export function useGetElectionWinners(numWinners: number): {
     };
 
     fetchData();
-  }, [electionId, numWinners]);
+  }, [electionIdQueryParam, numWinnersQueryParam]);
 
   return { response, closeElection, loading, error };
 }
