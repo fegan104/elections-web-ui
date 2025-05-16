@@ -2,11 +2,12 @@
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { TextInput } from "@/components/TextInput";
-import { useGetElectionWinners, useShareableVotingUrl } from "@/data/electionsClient";
+import { useGetElectionWinners, useQueryNumWinners, useShareableVotingUrl } from "@/data/electionsClient";
 import { analyticsEvents } from "@/data/firebaseClient";
 import { ElectionWinnersResponse, VoteCountingRound } from "@/data/model/models";
 import CircularProgress from "@/components/CircularProgress";
 import { forwardRef, Ref, Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ViewResults() {
 
@@ -18,8 +19,16 @@ export default function ViewResults() {
 }
 
 function ViewResultsScreen() {
+  const router = useRouter();
+  const { data } = useQueryNumWinners()
   const [numWinners, setNumWinners] = useState(1)
   const { response, closeElection, loading, error } = useGetElectionWinners(numWinners)
+
+  useEffect(() => {
+    if (data != null) {
+      setNumWinners(data)
+    }
+  }, [data])
 
   const handleCloseElection = async () => {
     closeElection(1)
@@ -34,7 +43,9 @@ function ViewResultsScreen() {
           data={response}
           onCloseElection={handleCloseElection}
           numWinners={numWinners}
-          onUpdateNumWinners={setNumWinners} />
+          onUpdateNumWinners={(newValue) => {
+            router.replace(`/view-results?electionId=${response.election.id}&numWinners=${newValue}`)
+          }} />
       ) : <></>}
     </div>
   )
