@@ -161,18 +161,18 @@ const ElectionStatus: React.FC<{ election: Election }> = ({ election }) => {
       </div>
 
       <div>
-        <h4 className="font-bold">Candidates:</h4>
-        <ul className="my-1">
+        <h3 className="font-bold">Candidates:</h3>
+        <ul className="my-1 list-disc list-inside">
           {election.candidates.map((candidate) => (
             <li key={candidate.id} className="text-sm">
-              -{candidate.name}
+              {candidate.name}
             </li>
           ))}
         </ul>
       </div>
 
       <div>
-        <h4 className="font-bold">Voters: {election.voters.length} total votes</h4>
+        <h3 className="font-bold">Voters: {election.voters.length} total votes</h3>
       </div>
     </div>
   )
