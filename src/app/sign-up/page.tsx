@@ -9,6 +9,7 @@ import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { analyticsEvents } from "@/data/firebaseClient";
 
+//TODO add a redirect query param
 export default function CreateAccount() {
   const { user } = useFirebaseUser()
   const router = useRouter()

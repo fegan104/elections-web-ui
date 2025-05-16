@@ -31,42 +31,12 @@ import Link from "next/link";
 import { User } from "firebase/auth";
 import CandidateNameListItem from "@/components/CandidateNameListItem";
 
-function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
+export default function Vote() {
   return (
-    <button className="px-1" {...props}>
-      ❌
-    </button>
-  );
-}
-
-function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, onClick: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: candidate.id },);
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    color: "black",
-  };
-
-  return (
-    <li>
-      <div
-        ref={setNodeRef}
-        style={{ ...style, display: "flex", touchAction: "none" }}
-        {...attributes}
-        {...listeners}
-        className="p-2 bg-gray-200 rounded-lg cursor-grab gap-2"
-      >
-        <span style={{ flex: 1 }}>
-          {candidate.name}
-        </span>
-
-        <span>
-          <Remove onClick={onClick} />
-        </span>
-      </div>
-    </li>
-  );
+    <Suspense>
+      <VoteScreen />
+    </Suspense>
+  )
 }
 
 function VoteScreen() {
@@ -95,7 +65,6 @@ function VoteScreen() {
   };
 
   const removeSelecteditem = (id: string) => {
-    console.log(items.filter((it) => it.id != id))
     setItems(items.filter((it) => it.id != id))
   }
 
@@ -192,6 +161,7 @@ function BallotCard(
       <div className={`${(status === 'unauthenticated') ? "" : "hidden"}`}>
         <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
         <Link passHref href="/sign-up">
+              //TODO add redirect query param
           <TonalButton className="w-full">Create an Account</TonalButton>
         </Link>
       </div>
@@ -221,10 +191,40 @@ function CandidateNamesCard(candidates: ElectionCandidate[], items: ElectionCand
   </div>;
 }
 
-export default function Vote() {
+function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, onClick: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: candidate.id },);
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    color: "black",
+  };
+
   return (
-    <Suspense>
-      <VoteScreen />
-    </Suspense>
-  )
+    <li>
+      <div
+        ref={setNodeRef}
+        style={{ ...style, display: "flex", touchAction: "none" }}
+        {...attributes}
+        {...listeners}
+        className="p-2 bg-gray-200 rounded-lg cursor-grab gap-2"
+      >
+        <span style={{ flex: 1 }}>
+          {candidate.name}
+        </span>
+
+        <span>
+          <Remove onClick={onClick} />
+        </span>
+      </div>
+    </li>
+  );
+}
+
+function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button className="px-1" {...props}>
+      ❌
+    </button>
+  );
 }
