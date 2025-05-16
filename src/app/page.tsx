@@ -139,7 +139,7 @@ const ElectionList: React.FC<{ elections: Election[] }> = ({ elections }) => {
                 <TextButton className="ring-primary ring-1"> {"Vote"} </TextButton>
               </Link>
 
-              <Link href={`/view-results?electionId=${election.id}&numWinners=1`}>
+              <Link href={`/view-results?electionId=${election.id}`}>
                 <TextButton className="ring-primary ring-1"> {"View Results"} </TextButton>
               </Link>
             </div>
