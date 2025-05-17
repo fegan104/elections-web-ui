@@ -1,6 +1,6 @@
 'use client';
 import { createUser } from "@/data/electionsClient";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { TextInput } from "@/components/TextInput";
@@ -10,8 +10,15 @@ import { ErrorMessage } from "@/components/ErrorMessage";
 import { analyticsEvents } from "@/data/firebaseClient";
 import { useQueryElectionId } from "@/data/useQueryParams";
 
-//TODO add a redirect query param
 export default function CreateAccount() {
+  return (
+    <Suspense>
+      <CreateAccountContent />
+    </Suspense>
+  )
+}
+
+function CreateAccountContent() {
   const { user } = useFirebaseUser()
   const router = useRouter()
   const [email, setEmail] = useState("");

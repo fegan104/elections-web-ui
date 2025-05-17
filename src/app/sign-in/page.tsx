@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { auth, signInWithEmailAndPassword, analyticsEvents, sendPasswordResetEmail } from "../../data/firebaseClient";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,14 @@ import { ErrorMessage } from "@/components/ErrorMessage";
 import { useQueryElectionId } from "@/data/useQueryParams";
 
 export default function SignIn() {
+  return (
+    <Suspense>
+      <SignInContent />
+    </Suspense>
+  )
+}
+
+function SignInContent() {
   const { user } = useFirebaseUser()
   const router = useRouter()
   const electionIdQueryParam = useQueryElectionId()

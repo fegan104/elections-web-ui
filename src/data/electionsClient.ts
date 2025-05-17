@@ -1,4 +1,3 @@
-import { useSearchParams } from "next/navigation";
 import { ElectionWinnersResponse, ElectionId, ElectionCandidate, Election } from "@/data/model/models";
 import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import useFirebaseUser from "./useFirebaseUser"
