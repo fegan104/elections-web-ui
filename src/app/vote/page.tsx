@@ -21,9 +21,9 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from "@/components/CircularProgress";
-import { ElectionCandidate } from "@/data/model/models";
+import { ElectionCandidate, ElectionId } from "@/data/model/models";
 import { sendVote, useGetElection } from "@/data/electionsClient";
-import { TonalButton } from "@/components/Buttons";
+import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { analyticsEvents } from "@/data/firebaseClient";
@@ -31,42 +31,12 @@ import Link from "next/link";
 import { User } from "firebase/auth";
 import CandidateNameListItem from "@/components/CandidateNameListItem";
 
-function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
+export default function Vote() {
   return (
-    <button className="px-1" {...props}>
-      ❌
-    </button>
-  );
-}
-
-function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, onClick: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: candidate.id },);
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    color: "black",
-  };
-
-  return (
-    <li>
-      <div
-        ref={setNodeRef}
-        style={{ ...style, display: "flex", touchAction: "none" }}
-        {...attributes}
-        {...listeners}
-        className="p-2 bg-gray-200 rounded-lg cursor-grab gap-2"
-      >
-        <span style={{ flex: 1 }}>
-          {candidate.name}
-        </span>
-
-        <span>
-          <Remove onClick={onClick} />
-        </span>
-      </div>
-    </li>
-  );
+    <Suspense>
+      <VoteScreen />
+    </Suspense>
+  )
 }
 
 function VoteScreen() {
@@ -95,7 +65,6 @@ function VoteScreen() {
   };
 
   const removeSelecteditem = (id: string) => {
-    console.log(items.filter((it) => it.id != id))
     setItems(items.filter((it) => it.id != id))
   }
 
@@ -147,11 +116,10 @@ function VoteScreen() {
       <div className="space-y-2">
         <div className="flex justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-fill md:w-fit">
-            
+
             {CandidateNamesCard(electionResultState.election.candidates, items, onAddCandidateToRankingList)}
 
-
-            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user)}
+            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user, electionResultState.election.id)}
           </div>
 
         </div>
@@ -164,15 +132,16 @@ function VoteScreen() {
 }
 
 function BallotCard(
-  sensors: SensorDescriptor<SensorOptions>[], 
-  handleDragEnd: (event: DragEndEvent) => void, 
-  items: ElectionCandidate[], 
-  removeSelecteditem: (id: string) => void, 
-  status: string, 
-  castVote: () => Promise<void>, 
+  sensors: SensorDescriptor<SensorOptions>[],
+  handleDragEnd: (event: DragEndEvent) => void,
+  items: ElectionCandidate[],
+  removeSelecteditem: (id: string) => void,
+  status: string,
+  castVote: () => Promise<void>,
   user: User | null,
+  electionId: ElectionId,
 ) {
-  return <div className="flex flex-col items-center w-[256px]">
+  return <div className="flex flex-col items-center w-[256px] h-fit">
     <Card className="space-y-2 h-full w-full">
       <h4>Your Ballot</h4>
 
@@ -189,11 +158,23 @@ function BallotCard(
         </DndContext>
       </div>
 
-      <div className={`${(status === 'unauthenticated') ? "" : "hidden"}`}>
+      <div className={`${(status === 'unauthenticated') ? "" : "hidden"} flex flex-col justify-center items-center`}>
         <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
-        <Link passHref href="/sign-up">
-          <TonalButton className="w-full">Create an Account</TonalButton>
-        </Link>
+        
+        <div className="w-full">
+          <Link passHref href={`/sign-up?electionId=${electionId}`}>
+            <TonalButton className="w-full">Create an Account</TonalButton>
+          </Link>
+        </div>
+
+        <p>or</p>
+
+        <div className="w-full">
+          <Link passHref href={`/sign-in?electionId=${electionId}`}>
+            <TextButton className="w-full ring-1">Sign In</TextButton>
+          </Link>
+        </div>
+
       </div>
 
       <TonalButton className={`w-full ${(status === 'authenticated') ? "" : "hidden"}`} onClick={castVote} disabled={(user == null) || (items.length == 0)}>
@@ -211,7 +192,7 @@ function CandidateNamesCard(candidates: ElectionCandidate[], items: ElectionCand
         {candidates.map(item => (
           <CandidateNameListItem
             key={item.id}
-            className={`${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`} 
+            className={`${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`}
             candidateName={item.name}
             onClick={() => onAddCandidateToRankingList(item)}
           />
@@ -221,10 +202,40 @@ function CandidateNamesCard(candidates: ElectionCandidate[], items: ElectionCand
   </div>;
 }
 
-export default function Vote() {
+function SortableItem({ candidate, onClick }: { candidate: ElectionCandidate, onClick: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: candidate.id },);
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    color: "black",
+  };
+
   return (
-    <Suspense>
-      <VoteScreen />
-    </Suspense>
-  )
+    <li>
+      <div
+        ref={setNodeRef}
+        style={{ ...style, display: "flex", touchAction: "none" }}
+        {...attributes}
+        {...listeners}
+        className="p-2 bg-gray-200 rounded-lg cursor-grab gap-2"
+      >
+        <span style={{ flex: 1 }}>
+          {candidate.name}
+        </span>
+
+        <span>
+          <Remove onClick={onClick} />
+        </span>
+      </div>
+    </li>
+  );
+}
+
+function Remove(props: React.HTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button className="px-1" {...props}>
+      ❌
+    </button>
+  );
 }

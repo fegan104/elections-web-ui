@@ -1,6 +1,6 @@
 'use client';
 import { createUser } from "@/data/electionsClient";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { TextInput } from "@/components/TextInput";
@@ -8,21 +8,36 @@ import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { analyticsEvents } from "@/data/firebaseClient";
+import { useQueryElectionId } from "@/data/useQueryParams";
 
 export default function CreateAccount() {
+  return (
+    <Suspense>
+      <CreateAccountContent />
+    </Suspense>
+  )
+}
+
+function CreateAccountContent() {
   const { user } = useFirebaseUser()
   const router = useRouter()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifiedPassword, setVerifiedPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const electionIdQueryParam = useQueryElectionId()
 
   //If a user is already signed in just send them home
   useEffect(() => {
     if (user != null) {
-      router.replace("/")
+      const electionId = electionIdQueryParam.data
+      if (electionId != null) {
+        router.replace(`/vote?electionId=${electionId}`)
+      } else {
+        router.replace("/")
+      }
     }
-  }, [user, router])
+  }, [user, router, electionIdQueryParam])
 
   const handleSignUp = async () => {
     try {
