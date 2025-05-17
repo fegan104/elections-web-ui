@@ -8,6 +8,7 @@ import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { analyticsEvents } from "@/data/firebaseClient";
+import { useQueryElectionId } from "@/data/useQueryParams";
 
 //TODO add a redirect query param
 export default function CreateAccount() {
@@ -17,13 +18,19 @@ export default function CreateAccount() {
   const [password, setPassword] = useState("");
   const [verifiedPassword, setVerifiedPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const electionIdQueryParam = useQueryElectionId()
 
   //If a user is already signed in just send them home
   useEffect(() => {
     if (user != null) {
-      router.replace("/")
+      const electionId = electionIdQueryParam.data
+      if (electionId != null) {
+        router.replace(`/vote?electionId=${electionId}`)
+      } else {
+        router.replace("/")
+      }
     }
-  }, [user, router])
+  }, [user, router, electionIdQueryParam])
 
   const handleSignUp = async () => {
     try {

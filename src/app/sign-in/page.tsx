@@ -7,20 +7,26 @@ import { TextInput } from "@/components/TextInput";
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { useQueryElectionId } from "@/data/useQueryParams";
 
 export default function SignIn() {
   const { user } = useFirebaseUser()
   const router = useRouter()
-
+  const electionIdQueryParam = useQueryElectionId()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user != null) {
-      router.replace("/")
+      const electionId = electionIdQueryParam.data
+      if (electionId != null) {
+        router.replace(`/vote?electionId=${electionId}`)
+      } else {
+        router.replace("/")
+      }
     }
-  }, [user, router])
+  }, [user, router, electionIdQueryParam])
 
   const handleSignIn = async () => {
     try {

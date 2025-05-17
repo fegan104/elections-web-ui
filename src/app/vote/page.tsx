@@ -21,9 +21,9 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from "@/components/CircularProgress";
-import { ElectionCandidate } from "@/data/model/models";
+import { ElectionCandidate, ElectionId } from "@/data/model/models";
 import { sendVote, useGetElection } from "@/data/electionsClient";
-import { TonalButton } from "@/components/Buttons";
+import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { analyticsEvents } from "@/data/firebaseClient";
@@ -116,11 +116,10 @@ function VoteScreen() {
       <div className="space-y-2">
         <div className="flex justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-fill md:w-fit">
-            
+
             {CandidateNamesCard(electionResultState.election.candidates, items, onAddCandidateToRankingList)}
 
-
-            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user)}
+            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user, electionResultState.election.id)}
           </div>
 
         </div>
@@ -133,15 +132,16 @@ function VoteScreen() {
 }
 
 function BallotCard(
-  sensors: SensorDescriptor<SensorOptions>[], 
-  handleDragEnd: (event: DragEndEvent) => void, 
-  items: ElectionCandidate[], 
-  removeSelecteditem: (id: string) => void, 
-  status: string, 
-  castVote: () => Promise<void>, 
+  sensors: SensorDescriptor<SensorOptions>[],
+  handleDragEnd: (event: DragEndEvent) => void,
+  items: ElectionCandidate[],
+  removeSelecteditem: (id: string) => void,
+  status: string,
+  castVote: () => Promise<void>,
   user: User | null,
+  electionId: ElectionId,
 ) {
-  return <div className="flex flex-col items-center w-[256px]">
+  return <div className="flex flex-col items-center w-[256px] h-fit">
     <Card className="space-y-2 h-full w-full">
       <h4>Your Ballot</h4>
 
@@ -158,12 +158,23 @@ function BallotCard(
         </DndContext>
       </div>
 
-      <div className={`${(status === 'unauthenticated') ? "" : "hidden"}`}>
+      <div className={`${(status === 'unauthenticated') ? "" : "hidden"} flex flex-col justify-center items-center`}>
         <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
-        <Link passHref href="/sign-up">
-              //TODO add redirect query param
-          <TonalButton className="w-full">Create an Account</TonalButton>
-        </Link>
+        
+        <div className="w-full">
+          <Link passHref href={`/sign-up?electionId=${electionId}`}>
+            <TonalButton className="w-full">Create an Account</TonalButton>
+          </Link>
+        </div>
+
+        <p>or</p>
+
+        <div className="w-full">
+          <Link passHref href={`/sign-in?electionId=${electionId}`}>
+            <TextButton className="w-full ring-1">Sign In</TextButton>
+          </Link>
+        </div>
+
       </div>
 
       <TonalButton className={`w-full ${(status === 'authenticated') ? "" : "hidden"}`} onClick={castVote} disabled={(user == null) || (items.length == 0)}>
@@ -181,7 +192,7 @@ function CandidateNamesCard(candidates: ElectionCandidate[], items: ElectionCand
         {candidates.map(item => (
           <CandidateNameListItem
             key={item.id}
-            className={`${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`} 
+            className={`${items.some(c => c.id === item.id) ? "bg-green-300 rounded-md" : ""}`}
             candidateName={item.name}
             onClick={() => onAddCandidateToRankingList(item)}
           />

@@ -2,13 +2,14 @@
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { TextInput } from "@/components/TextInput";
-import { useGetElectionWinners, useQueryNumWinners, useShareableVotingUrl } from "@/data/electionsClient";
+import { useGetElectionWinners, useShareableVotingUrl } from "@/data/electionsClient";
 import { analyticsEvents } from "@/data/firebaseClient";
 import { ElectionWinnersResponse, VoteCountingRound } from "@/data/model/models";
 import CircularProgress from "@/components/CircularProgress";
 import { forwardRef, Ref, Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { useQueryNumWinners } from "@/data/useQueryParams";
 
 export default function ViewResults() {
 

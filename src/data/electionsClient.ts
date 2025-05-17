@@ -3,16 +3,11 @@ import { ElectionWinnersResponse, ElectionId, ElectionCandidate, Election } from
 import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import useFirebaseUser from "./useFirebaseUser"
 import { useEffect, useState } from "react"
+import { useQueryElectionId, useQueryNumWinners } from "./useQueryParams";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 ///////TYPES
-
-interface QueryParamState<T> {
-  data: T,
-  isLoading: boolean,
-  failure: Error | null
-}
 
 interface CreateUserRequest {
   email: string,
@@ -75,48 +70,6 @@ export async function sendVote(electionId: ElectionId, rankings: ElectionCandida
 }
 
 //////HOOKS
-
-export function useQueryElectionId(): QueryParamState<ElectionId | null> {
-  const queryParams = useSearchParams()
-  const [state, setState] = useState<QueryParamState<ElectionId | null>>({
-    data: null,
-    isLoading: true,
-    failure: null,
-  })
-
-  useEffect(() => {
-    const parsedId = queryParams.get("electionId")
-    if (parsedId !== undefined && parsedId != null && parsedId.length > 1) {
-      setState({ data: parsedId, isLoading: false, failure: null });
-    } else {
-      setState({ data: null, isLoading: false, failure: Error(`Invalid electionid: ${parsedId}`) });
-    }
-  }, [queryParams]);
-
-  return state
-}
-
-export function useQueryNumWinners(): QueryParamState<number> {
-  const queryParams = useSearchParams()
-  const [state, setState] = useState<QueryParamState<number>>({
-    data: 1,
-    isLoading: true,
-    failure: null,
-  })
-
-  useEffect(() => {
-    const parsedNumWinners = queryParams.get("numWinners")
-    if (parsedNumWinners !== undefined && parsedNumWinners != null && !isNaN(parseInt(parsedNumWinners))) {
-      setState({ data: parseInt(parsedNumWinners), isLoading: false, failure: null });
-    } else {
-      console.log("numWinenrs query param could not be parsed falling back to 1")
-      setState({ data: 1, isLoading: false, failure: null });
-    }
-  }, [queryParams]);
-
-  return state
-}
-
 
 export function useGetCurrentUsersElections(): { data: Election[]; loading: boolean; error: string | null } {
   const [data, setData] = useState<Election[]>([]);

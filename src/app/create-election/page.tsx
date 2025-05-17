@@ -26,7 +26,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="items-center justify-items-center">
+    <div className="flex flex-col w-full items-center justify-items-center">
       <Card>
         <form action={submitForm} className="space-y-4">
 
