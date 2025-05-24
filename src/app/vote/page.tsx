@@ -93,8 +93,11 @@ function VoteScreen() {
 
   if (submissionState === true) {
     return (
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center justify-center gap-4">
         <h3>Your ballot was submitted successfully ✅</h3>
+        <Link href="/" passHref>
+          <TonalButton>Back to Homepage</TonalButton>
+        </Link>
       </div>
     )
   }
