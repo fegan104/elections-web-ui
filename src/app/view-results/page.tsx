@@ -250,7 +250,7 @@ const VotingRoundsViewer: React.FC<{ rounds: VoteCountingRound[] }> = ({ rounds 
       <h3 className="mb-2">
         Action: {currentRound.action}
       </h3>
-      <p className="mb-2">Quota: {currentRound.quota}</p>
+      <p className="mb-2">Quota: {new Intl.NumberFormat("en-US").format(currentRound.quota)}</p>
 
       <div className="mb-4">
         <h3 className="font-semibold">Winners:</h3>
