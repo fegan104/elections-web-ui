@@ -91,12 +91,12 @@ function VoteScreen() {
     }
   }
 
-  if (submissionState === true) {
+  if (submissionState === true && electionResultState.state == 'success') {
     return (
       <div className="flex flex-col items-center justify-center gap-4">
         <h3>Your ballot was submitted successfully ✅</h3>
-        <Link href="/" passHref>
-          <TonalButton>Back to Homepage</TonalButton>
+        <Link passHref href={`/view-results?electionId=${electionResultState.election.id}`}>
+          <TonalButton>View election results</TonalButton>
         </Link>
       </div>
     )
