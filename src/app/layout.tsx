@@ -66,7 +66,7 @@ function Scaffold({
         </div>
 
         <div className="flex flex-1 flex-col">
-          <div className="flex-1 overflow-y-auto p-4 ring-foreground ring-1 rounded-2xl m-4">
+          <div className="flex-1 overflow-y-auto p-4 ring-foreground ring-1 rounded-2xl m-4" style={{"scrollbarWidth": "none"}}>
             {children}
           </div>
         </div>
