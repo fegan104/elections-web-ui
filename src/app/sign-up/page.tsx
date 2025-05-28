@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { TextInput } from "@/components/TextInput";
+import { PasswordInput } from "@/components/PasswordInput";
 import { TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
@@ -66,8 +67,8 @@ function CreateAccountContent() {
         <h2>Register a new account</h2>
         <form action={handleSignUp} className="space-y-4">
           <TextInput value={email} onChange={(e) => setEmail(e)} label="Email" />
-          <TextInput type="password" value={password} onChange={(e) => setPassword(e)} label="Password" />
-          <TextInput type="password" value={verifiedPassword} onChange={(e) => setVerifiedPassword(e)} label="Confirm Password" />
+          <PasswordInput value={password} onChange={(e) => setPassword(e)} label="Password" />
+          <PasswordInput value={verifiedPassword} onChange={(e) => setVerifiedPassword(e)} label="Confirm Password" />
           <div className="flex w-full justify-end">
             <TonalButton type="submit">Create Account</TonalButton>
           </div>
