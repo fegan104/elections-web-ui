@@ -4,6 +4,7 @@ import { auth, signInWithEmailAndPassword, analyticsEvents, sendPasswordResetEma
 import useFirebaseUser from "@/data/useFirebaseUser";
 import { useRouter } from "next/navigation";
 import { TextInput } from "@/components/TextInput";
+import { PasswordInput } from "@/components/PasswordInput";
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { ErrorMessage } from "@/components/ErrorMessage";
@@ -61,7 +62,7 @@ function SignInContent() {
         <h2>Enter you account details</h2>
         <form action={handleSignIn} className="space-y-4">
           <TextInput value={email} onChange={(e) => setEmail(e)} label="Email" />
-          <TextInput type="password" value={password} onChange={(e) => setPassword(e)} label="Password" />
+          <PasswordInput value={password} onChange={(e) => setPassword(e)} label="Password" />
           <div className="flex w-full justify-end space-x-4">
             <TextButton className="ring-1" disabled={email.length == 0} onClick={resetPassword}>Reset Password</TextButton>
             <TonalButton type="submit">Sign In</TonalButton>
