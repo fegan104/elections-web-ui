@@ -44,6 +44,7 @@ function VoteScreen() {
   const { status, user } = useFirebaseUser()
   const [items, setItems] = useState<ElectionCandidate[]>([]);
   const [submissionState, setSubmissionState] = useState<boolean | null>(null)
+  const [isVoting, setIsVoting] = useState<boolean>(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 10 } }),
@@ -84,10 +85,15 @@ function VoteScreen() {
     if (electionId === undefined) {
       return
     }
-    const response = await sendVote(electionId, items)
-    setSubmissionState(response.ok)
-    if (response.ok) {
-      analyticsEvents.trackVote()
+    setIsVoting(true)
+    try {
+      const response = await sendVote(electionId, items)
+      setSubmissionState(response.ok)
+      if (response.ok) {
+        analyticsEvents.trackVote()
+      }
+    } finally {
+      setIsVoting(false)
     }
   }
 
@@ -143,6 +149,7 @@ function BallotCard(
   castVote: () => Promise<void>,
   user: User | null,
   electionId: ElectionId,
+  isVoting: boolean,
 ) {
   return <div className="flex flex-col items-center w-[256px] h-fit">
     <Card className="space-y-2 h-full w-full">
@@ -180,8 +187,8 @@ function BallotCard(
 
       </div>
 
-      <TonalButton className={`w-full ${(status === 'authenticated') ? "" : "hidden"}`} onClick={castVote} disabled={(user == null) || (items.length == 0)}>
-        Cast Vote
+      <TonalButton className={`w-full ${(status === 'authenticated') ? "" : "hidden"}`} onClick={castVote} disabled={(user == null) || (items.length == 0) || isVoting}>
+        {isVoting ? <CircularProgress size={24} /> : "Cast Vote"}
       </TonalButton>
     </Card>
   </div>;
