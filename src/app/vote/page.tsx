@@ -128,7 +128,7 @@ function VoteScreen() {
 
             {CandidateNamesCard(electionResultState.election.candidates, items, onAddCandidateToRankingList)}
 
-            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user, electionResultState.election.id)}
+            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user, electionResultState.election.id, isVoting)}
           </div>
 
         </div>
