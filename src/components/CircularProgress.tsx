@@ -6,7 +6,7 @@ const CircularProgress = ({ size = 40, strokeWidth = 4, color = "text-blue-600",
 
   return (
     <div className="relative">
-      <div className={`absolute top-0 inset-0 z-10 flex justify-center ${color} ${className}`}>
+      <div className={`top-0 inset-0 z-10 flex justify-center ${color} ${className}`}>
         <svg
           className="animate-spin"
           width={size}
