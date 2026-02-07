@@ -66,6 +66,10 @@ async function postCreateElection(request: CreateElectionRequest): Promise<Elect
   await auth.authStateReady();
   const idToken = await auth.currentUser?.getIdToken();
 
+  if (!idToken) {
+    throw new Error('You must be signed in to complete that action.');
+  }
+
   const response = await fetch(`${BASE_URL}elections/create`, {
     method: 'POST',
     headers: {
@@ -88,6 +92,10 @@ async function postVote(
 ): Promise<Response> {
   await auth.authStateReady();
   const idToken = await auth.currentUser?.getIdToken();
+
+  if (!idToken) {
+    throw new Error('You must be signed in to complete that action.');
+  }
 
   const request = rankings.map((candidate, index) => ({
     candidateId: candidate.id,
@@ -116,6 +124,10 @@ async function closeElection(
 ): Promise<ElectionWinnersResponse> {
   await auth.authStateReady();
   const idToken = await auth.currentUser?.getIdToken();
+
+  if (!idToken) {
+    throw new Error('You must be signed in to complete that action.');
+  }
 
   const response = await fetch(
     `${BASE_URL}elections/close?electionId=${electionId}&numWinners=${numWinners}`,
@@ -187,7 +199,8 @@ export function useElectionResults() {
     enabled:
       !electionIdQueryParam.isLoading &&
       !numWinnersQueryParam.isLoading &&
-      electionIdQueryParam.data !== null,
+      electionIdQueryParam.data !== null &&
+      numWinnersQueryParam.data !== null,
   });
 }
 
