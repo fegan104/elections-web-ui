@@ -173,7 +173,7 @@ export function useElection() {
       }
       return fetchElection(queryParam.data);
     },
-    enabled: !queryParam.isLoading && queryParam.data !== null,
+    enabled: !queryParam.isLoading && queryParam.data != null,
   });
 }
 
