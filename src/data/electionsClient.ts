@@ -1,4 +1,4 @@
-import { ElectionId, ElectionCandidate, Election } from "@/data/model/models";
+import { Election } from "@/data/model/models";
 import { auth, createUserWithEmailAndPassword } from "./firebaseClient";
 import { useEffect, useState } from "react"
 
@@ -11,29 +11,7 @@ interface CreateUserRequest {
   password: string,
 }
 
-interface CreateElectionRequest {
-  name: string
-  candidates: string[]
-}
-
 /////FUNCTIONS
-
-export async function createNewElection(request: CreateElectionRequest) {
-  await auth.authStateReady()
-  const idToken = await auth.currentUser?.getIdToken()
-  console.log(request)
-  const response = await fetch(`${BASE_URL}elections/create`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${idToken}`,
-    },
-    body: JSON.stringify(request),
-  })
-
-  console.log(response)
-  return response
-}
 
 export async function createUser(request: CreateUserRequest) {
   const credentials = await createUserWithEmailAndPassword(auth, request.email, request.password)
@@ -44,25 +22,6 @@ export async function createUser(request: CreateUserRequest) {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${idToken}`,
     },
-  })
-}
-
-export async function sendVote(electionId: ElectionId, rankings: ElectionCandidate[]) {
-  await auth.authStateReady()
-  const idToken = await auth.currentUser?.getIdToken()
-  const request = rankings.map((candidate, index) => {
-    return {
-      candidateId: candidate.id,
-      rank: (index + 1)
-    }
-  })
-  return await fetch(`${BASE_URL}elections/vote?electionId=${electionId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${idToken}`,
-    },
-    body: JSON.stringify(request)
   })
 }
 

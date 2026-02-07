@@ -1,10 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Election, ElectionWinnersResponse, ElectionId } from '@/data/model/models';
+import { Election, ElectionWinnersResponse, ElectionId, ElectionCandidate } from '@/data/model/models';
 import { auth } from './firebaseClient';
 import useFirebaseUser from './useFirebaseUser';
 import { useQueryElectionId, useQueryNumWinners } from './useQueryParams';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// ============ Types ============
+
+interface CreateElectionRequest {
+  name: string;
+  candidates: string[];
+}
 
 // ============ Fetch Functions ============
 
@@ -53,6 +60,54 @@ async function fetchElectionResults(
   }
 
   return response.json();
+}
+
+async function postCreateElection(request: CreateElectionRequest): Promise<Election> {
+  await auth.authStateReady();
+  const idToken = await auth.currentUser?.getIdToken();
+
+  const response = await fetch(`${BASE_URL}elections/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+async function postVote(
+  electionId: ElectionId,
+  rankings: ElectionCandidate[]
+): Promise<Response> {
+  await auth.authStateReady();
+  const idToken = await auth.currentUser?.getIdToken();
+
+  const request = rankings.map((candidate, index) => ({
+    candidateId: candidate.id,
+    rank: index + 1,
+  }));
+
+  const response = await fetch(`${BASE_URL}elections/vote?electionId=${electionId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response;
 }
 
 async function closeElection(
@@ -136,6 +191,35 @@ export function useElectionResults() {
   });
 }
 
+// ============ Mutation Hooks ============
+
+export function useCreateElection() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: CreateElectionRequest) => postCreateElection(request),
+    onSuccess: () => {
+      // Invalidate the elections list so it refetches
+      queryClient.invalidateQueries({ queryKey: ['elections'] });
+    },
+  });
+}
+
+export function useSendVote() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ electionId, rankings }: { electionId: ElectionId; rankings: ElectionCandidate[] }) =>
+      postVote(electionId, rankings),
+    onSuccess: (_, variables) => {
+      // Invalidate election results since vote count changed
+      queryClient.invalidateQueries({ queryKey: ['election-results', variables.electionId] });
+      // Also invalidate the election itself (voter count may have changed)
+      queryClient.invalidateQueries({ queryKey: ['election', variables.electionId] });
+    },
+  });
+}
+
 export function useCloseElection() {
   const queryClient = useQueryClient();
 
@@ -148,10 +232,13 @@ export function useCloseElection() {
         ['election-results', variables.electionId, variables.numWinners],
         data
       );
-      // Also invalidate to ensure freshness
+      // Invalidate to ensure freshness
       queryClient.invalidateQueries({
         queryKey: ['election-results', variables.electionId],
       });
+      // Also invalidate elections list (election status changed to closed)
+      queryClient.invalidateQueries({ queryKey: ['elections'] });
     },
   });
 }
+

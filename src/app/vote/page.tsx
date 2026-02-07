@@ -22,8 +22,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from "@/components/CircularProgress";
 import { ElectionCandidate, ElectionId } from "@/data/model/models";
-import { sendVote } from "@/data/electionsClient";
-import { useElection } from "@/data/queries";
+import { useElection, useSendVote } from "@/data/queries";
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
@@ -42,10 +41,10 @@ export default function Vote() {
 
 function VoteScreen() {
   const { data: election, isPending, error } = useElection()
+  const sendVoteMutation = useSendVote()
   const { status, user } = useFirebaseUser()
   const [items, setItems] = useState<ElectionCandidate[]>([]);
   const [submissionState, setSubmissionState] = useState<boolean | null>(null)
-  const [isVoting, setIsVoting] = useState<boolean>(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 10 } }),
@@ -86,16 +85,18 @@ function VoteScreen() {
     if (electionId === undefined) {
       return
     }
-    setIsVoting(true)
-    try {
-      const response = await sendVote(electionId, items)
-      setSubmissionState(response.ok)
-      if (response.ok) {
-        analyticsEvents.trackVote()
+    sendVoteMutation.mutate(
+      { electionId, rankings: items },
+      {
+        onSuccess: () => {
+          setSubmissionState(true)
+          analyticsEvents.trackVote()
+        },
+        onError: () => {
+          setSubmissionState(false)
+        }
       }
-    } finally {
-      setIsVoting(false)
-    }
+    )
   }
 
   if (submissionState === true && election) {
@@ -129,7 +130,7 @@ function VoteScreen() {
 
             {CandidateNamesCard(election.candidates, items, onAddCandidateToRankingList)}
 
-            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user, election.id, isVoting)}
+            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user, election.id, sendVoteMutation.isPending)}
           </div>
 
         </div>
