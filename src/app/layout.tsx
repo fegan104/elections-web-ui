@@ -6,6 +6,7 @@ import { auth, signOut } from "@/data/firebaseClient"
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { PlusCircle, UserCircle } from "lucide-react";
 import Link from "next/link";
+import { QueryProvider } from "@/components/QueryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,9 +43,11 @@ export default function RootLayout({
           antialiased bg-background font-mono 
           h-full overflow-hidden flex flex-col`}>
 
-        <Scaffold>
-          {children}
-        </Scaffold>
+        <QueryProvider>
+          <Scaffold>
+            {children}
+          </Scaffold>
+        </QueryProvider>
 
       </body>
     </html>
@@ -66,7 +69,7 @@ function Scaffold({
         </div>
 
         <div className="flex flex-1 flex-col">
-          <div className="flex-1 overflow-y-auto p-4 ring-foreground ring-1 rounded-2xl m-4" style={{"scrollbarWidth": "none"}}>
+          <div className="flex-1 overflow-y-auto p-4 ring-foreground ring-1 rounded-2xl m-4" style={{ "scrollbarWidth": "none" }}>
             {children}
           </div>
         </div>

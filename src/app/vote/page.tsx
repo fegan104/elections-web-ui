@@ -22,7 +22,8 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import CircularProgress from "@/components/CircularProgress";
 import { ElectionCandidate, ElectionId } from "@/data/model/models";
-import { sendVote, useGetElection } from "@/data/electionsClient";
+import { sendVote } from "@/data/electionsClient";
+import { useElection } from "@/data/queries";
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import useFirebaseUser from "@/data/useFirebaseUser";
@@ -40,7 +41,7 @@ export default function Vote() {
 }
 
 function VoteScreen() {
-  const electionResultState = useGetElection()
+  const { data: election, isPending, error } = useElection()
   const { status, user } = useFirebaseUser()
   const [items, setItems] = useState<ElectionCandidate[]>([]);
   const [submissionState, setSubmissionState] = useState<boolean | null>(null)
@@ -78,10 +79,10 @@ function VoteScreen() {
   }
 
   const castVote = async () => {
-    if (electionResultState.state != "success") {
+    if (!election) {
       return
     }
-    const electionId = electionResultState.election.id
+    const electionId = election.id
     if (electionId === undefined) {
       return
     }
@@ -97,22 +98,22 @@ function VoteScreen() {
     }
   }
 
-  if (submissionState === true && electionResultState.state == 'success') {
+  if (submissionState === true && election) {
     return (
       <div className="flex flex-col items-center justify-center gap-4">
         <h3>Your ballot was submitted successfully ✅</h3>
-        <Link passHref href={`/view-results?electionId=${electionResultState.election.id}`}>
+        <Link passHref href={`/view-results?electionId=${election.id}`}>
           <TonalButton>View election results</TonalButton>
         </Link>
       </div>
     )
   }
 
-  if (electionResultState.state == "loading") {
+  if (isPending) {
     return (<CircularProgress />)
   }
 
-  if (electionResultState.state == "error") {
+  if (error) {
     return (
       <div>
         <h3 className="flex justify-center">Hmmn we can&apos;t find that election 🤔</h3>
@@ -120,15 +121,15 @@ function VoteScreen() {
     )
   }
 
-  if (electionResultState.state == "success") {
+  if (election) {
     return (
       <div className="space-y-2">
         <div className="flex justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-fill md:w-fit">
 
-            {CandidateNamesCard(electionResultState.election.candidates, items, onAddCandidateToRankingList)}
+            {CandidateNamesCard(election.candidates, items, onAddCandidateToRankingList)}
 
-            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user, electionResultState.election.id, isVoting)}
+            {BallotCard(sensors, handleDragEnd, items, removeSelecteditem, status, castVote, user, election.id, isVoting)}
           </div>
 
         </div>
@@ -170,7 +171,7 @@ function BallotCard(
 
       <div className={`${(status === 'unauthenticated') ? "" : "hidden"} flex flex-col justify-center items-center`}>
         <p className="font-medium text-sm my-2">You must be signed in to cast a ballot.</p>
-        
+
         <div className="w-full">
           <Link passHref href={`/sign-up?electionId=${electionId}`}>
             <TonalButton className="w-full">Create an Account</TonalButton>
