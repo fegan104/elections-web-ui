@@ -1,5 +1,5 @@
 'use client'
-import { useGetCurrentUsersElections } from "@/data/electionsClient"
+import { useCurrentUsersElections } from "@/data/queries"
 import CircularProgress from "@/components/CircularProgress";
 import { Election } from "@/data/model/models"
 import FloatingActionButton, { TextButton, TonalButton } from "@/components/Buttons";
@@ -47,7 +47,7 @@ const LandingPage = () => {
           3. Taylor
         </blockquote>
         <p>
-          This helps make sure your vote still counts, even if your top choice doesn’t win.
+          This helps make sure your vote still counts, even if your top choice doesn&apos;t win.
         </p>
       </section>
 
@@ -108,14 +108,14 @@ const ViewElections = () => {
 }
 
 const ViewElectionsContent = () => {
-  const { data, loading, error } = useGetCurrentUsersElections()
+  const { data, isLoading, error } = useCurrentUsersElections()
 
-  if (loading) {
+  if (isLoading) {
     return <CircularProgress />
   } else if (error) {
     return (
       <ErrorMessage>
-        {error}
+        {error.message}
       </ErrorMessage>
     )
   } else if (data) {

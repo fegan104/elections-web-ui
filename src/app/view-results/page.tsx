@@ -2,7 +2,8 @@
 import { TextButton, TonalButton } from "@/components/Buttons";
 import { Card } from "@/components/Card";
 import { TextInput } from "@/components/TextInput";
-import { useGetElectionWinners, useShareableVotingUrl } from "@/data/electionsClient";
+import { useShareableVotingUrl } from "@/data/electionsClient";
+import { useElectionResults, useCloseElection } from "@/data/queries";
 import { analyticsEvents } from "@/data/firebaseClient";
 import { ElectionWinnersResponse, VoteCountingRound } from "@/data/model/models";
 import CircularProgress from "@/components/CircularProgress";
@@ -23,16 +24,20 @@ export default function ViewResults() {
 function ViewResultsScreen() {
   const router = useRouter();
   const numWinnersQueryParam = useQueryNumWinners()
-  const { response, closeElection, loading, error } = useGetElectionWinners()
+  const { data: response, isPending, error } = useElectionResults()
+  const closeElectionMutation = useCloseElection()
 
   const handleCloseElection = async () => {
-    closeElection(1)
+    if (!response?.election?.id) return
+    closeElectionMutation.mutate({ electionId: response.election.id, numWinners: 1 })
   }
+
+  const isLoading = isPending || closeElectionMutation.isPending
 
   return (
     <div>
-      {loading ? <CircularProgress /> : <></>}
-      {error ? (<ErrorMessage> {error} </ErrorMessage>) : <></>}
+      {isLoading ? <CircularProgress /> : <></>}
+      {error ? (<ErrorMessage> {error.message} </ErrorMessage>) : <></>}
       {response != null ? (
         <ElectionResults
           data={response}

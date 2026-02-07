@@ -3,7 +3,7 @@ import { TextButton, TonalButton } from "@/components/Buttons"
 import CandidateNameListItem from "@/components/CandidateNameListItem"
 import { Card } from "@/components/Card"
 import { TextInput } from "@/components/TextInput"
-import { createNewElection } from "@/data/electionsClient"
+import { useCreateElection } from "@/data/queries"
 import { analyticsEvents } from "@/data/firebaseClient"
 import { useRouter } from "next/navigation"
 import { KeyboardEvent, useState } from "react"
@@ -12,17 +12,19 @@ export default function SignIn() {
   const [getCandidates, setCandidates] = useState<string[]>([])
   const [getElectionName, setElectionName] = useState<string>("")
   const router = useRouter()
+  const createElectionMutation = useCreateElection()
 
   const submitForm = async () => {
     const request = {
       name: getElectionName,
       candidates: getCandidates,
     }
-    const response = await createNewElection(request)
-    if (response.ok) {
-      analyticsEvents.trackCreateElection()
-      router.replace("/")
-    }
+    createElectionMutation.mutate(request, {
+      onSuccess: () => {
+        analyticsEvents.trackCreateElection()
+        router.replace("/")
+      }
+    })
   }
 
   return (
